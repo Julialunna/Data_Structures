@@ -1,7 +1,0 @@
-OPT tem o tamanho do array o algoritmo e seed
-SORTPEF tem o número de movimentações de chamadas e de comparações, tem a função de zerar resetcounter, inccmp incrementa comparação, incmove o de movimentação, inccalss o de chamadas, temos a função de printar o 
-S é um sortperf com os contadores
-l(left) = 0 r(right) = opt.size-1
-INITVECTOR inicia os vetores com valores aleatórios , tem a função de imprimir vetor
-SWAP já incrementa o número de movimentações e recebe os ponteiros dos 2 itens a serem trocados 
-PARSE_ARG le as opcoes da linha de comando e inicializa variaveis, inicializa OPT
