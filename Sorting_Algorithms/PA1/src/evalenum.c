@@ -169,11 +169,43 @@ void recursiveSelectionSort(int arr[], int l, int r, sortperf_t * s)
 
 // selection sort
 void selectionSort(int arr[], int l, int r, sortperf_t * s) { 
+    inccalls(s, 1);
+    int smaller;
+    for (int i = l; i < r; i++){
+        smaller = i;
+        for (int j = i+1; j <= r; j++){
+            inccmp(s,1);
+            if (arr[j] < arr[smaller] ){
+                smaller = j;
+            }
+        }
+        if(i != smaller){
+            swap(&arr[i], &arr[smaller], s);
+        }
+    }
   return;
 }
 
 //insertion sort
 void insertionSort(int v[], int l, int r, sortperf_t * s) {
+    int j;
+    inccalls(s, 1);
+    for(int i = l+1; i < r+1; i++){
+        incmove(s,1);
+        int round_item = v[i];
+        j = i-1;
+
+        inccmp(s, 1);
+        while(j>=0 && round_item < v[j]){
+            inccmp(s, 1);
+
+            v[j+1] = v[j];
+            incmove(s,1);
+            j--;
+        }
+        incmove(s,1);
+        v[j+1] = round_item;
+    }
   return;
 }
 
