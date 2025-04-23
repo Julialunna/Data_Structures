@@ -1,6 +1,6 @@
 #ifndef GRAPH_HPP
 #define GRAPH_HPP
-#include "adjacency_list.hpp"
+#include "list_adjacency.hpp"
 
 /*  Você pode inserir os includes necessários para que sua classe funcione.
  * Nenhuma outra alteração neste arquivo é permitida
