@@ -2,15 +2,13 @@
 #define NODE_ADJACENCY_HPP
 #include <iostream>
 #include "list.hpp"
-#include "node.hpp"
+
 class No_adjacencia{
-    private:    
-        int num_vertice;
+    private:   
         Lista* lista_adjacencia;
         No_adjacencia* proximo_no;
     public:
         No_adjacencia();
-        No_adjacencia(int num_vertice);
         Lista* get_lista();
         void set_lista(Lista* lista_adjacencia_no);
         int get_num_vertice();

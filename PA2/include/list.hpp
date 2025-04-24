@@ -29,6 +29,7 @@ class Lista{
         ~Lista();
         void insere_final(int valor_novo_no);
         No* get_cabeca();
+        int get_tamanho();
 
 };
 #endif

@@ -21,19 +21,46 @@ int Grafo::QuantidadeVertices(){
     No_adjacencia* no_atual = this->vertices.get_cabeca()->get_proximo_no_adjacencia();
     while(no_atual!=nullptr){
         quant_vertices++;
+        no_atual = no_atual->get_proximo_no_adjacencia();
     }
     return quant_vertices;
 }
 int Grafo::QuantidadeArestas(){
-
-
+    No_adjacencia* vertice_atual = this->vertices.get_cabeca()->get_proximo_no_adjacencia();
+    int quant_arestas = 0;
+    while(vertice_atual!=nullptr){
+        No* no_atual = vertice_atual->get_lista()->get_cabeca()->get_proximo_no();
+        while(no_atual !=nullptr){
+            quant_arestas++;
+            no_atual = no_atual->get_proximo_no();
+        }
+        vertice_atual = vertice_atual->get_proximo_no_adjacencia();
+    }
+    return quant_arestas / 2;
 }
 
 int Grafo::GrauMinimo(){
+    No_adjacencia* vertice_atual = this->vertices.get_cabeca()->get_proximo_no_adjacencia();
+    int menor_grau = vertice_atual->get_lista()->get_tamanho();
+    while(vertice_atual!=nullptr){
+        if(vertice_atual->get_lista()->get_tamanho() < menor_grau){
+            menor_grau = vertice_atual->get_lista()->get_tamanho();
+        }
+        vertice_atual = vertice_atual->get_proximo_no_adjacencia();
+    }
+    return menor_grau;
 
 }
 int Grafo::GrauMaximo(){
-
+    No_adjacencia* vertice_atual = this->vertices.get_cabeca()->get_proximo_no_adjacencia();
+    int maior_grau = vertice_atual->get_lista()->get_tamanho();
+    while(vertice_atual!=nullptr){
+        if(vertice_atual->get_lista()->get_tamanho() > maior_grau){
+            maior_grau = vertice_atual->get_lista()->get_tamanho();
+        }
+        vertice_atual = vertice_atual->get_proximo_no_adjacencia();
+    }
+    return maior_grau;
 }
 
 void Grafo::ImprimeVizinhos(int v){

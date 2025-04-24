@@ -1,7 +1,6 @@
 #ifndef NODE_HPP
 #define NODE_HPP
 #include <iostream>
-#include "list.hpp"
 class No{
     private: 
         int valor;

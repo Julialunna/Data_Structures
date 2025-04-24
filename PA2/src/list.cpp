@@ -24,6 +24,10 @@ Lista::Lista(){
     this->tamanho = 0;
 }
 
+int Lista::get_tamanho(){
+    return this->tamanho;
+}
+
 Lista::~Lista(){
     No* no_atual = this->cabeca;
     while(no_atual != nullptr){
