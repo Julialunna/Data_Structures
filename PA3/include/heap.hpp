@@ -11,18 +11,19 @@ class Heap{
         Heap(int maxsize);
         ~Heap();
 
-        void Inserir(int x);
-        int Remover();
+        void Insert(int x);
+        int Remove();
 
         //Retorna true caso o heap esteja vazio, false caso contrário.
-        bool Vazio();
+        bool Empty();
+        int GetData(int j);
 
     private:
-        int GetAncestral(int posicao);
-        int GetSucessorEsq(int posicao);
-        int GetSucessorDir(int posicao);
+        int GetAncestor(int position);
+        int GetSuccessorLeft(int position);
+        int GetSuccessorRight(int position);
 
-        int tamanho;
+        int size;
         int* data;
 };
 
