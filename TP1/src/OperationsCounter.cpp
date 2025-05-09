@@ -25,6 +25,16 @@ void OperationsCounter::inccalls(int num)
     this->calls += num;
 }
 
+int OperationsCounter::get_cmp(){
+    return this->cmp;
+}
+int OperationsCounter::get_move(){
+    return this->move;
+}
+int OperationsCounter::get_calls(){
+    return this->calls;
+}
+
 void OperationsCounter::print_operations_counter()
 {
 

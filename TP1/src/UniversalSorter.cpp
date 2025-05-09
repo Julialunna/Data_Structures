@@ -154,29 +154,50 @@ void UniversalSorter::universal_sorter(int *v, int v_size, int min_partition_siz
     }
   }
 }
+
+float UniversalSorter::calculate_cost (){
+  int cost = this->comparison_coefficient * this->operation_counter.get_cmp() + this->movimentation_coefficient * this->operation_counter.get_move() + this->call_coefficient * this->operation_counter.get_calls();
+  return cost;
+}
+
+
+void UniversalSorter::print_statics(int cost, int partition_size){
+  std::cout<<"mps "<<partition_size<<" cost "<<cost<<" cmp "<<this->operation_counter.get_cmp()<< " move "<<this->operation_counter.get_move()<< " calls "<< this->operation_counter.get_calls()<<std::endl;
+}
+
+
 //min partition size
 int UniversalSorter::determine_partition_threshold (int *v, int v_size, int cost_threshold){
   int min_partition_size_range = 2, max_partition_size_range = v_size, 
   step = (max_partition_size_range - min_partition_size_range) / 5, 
-  difference_max_min_cost = cost_threshold+1, num_partitions = 5, j=0;
-
+  difference_max_min_cost = cost_threshold+1, num_partitions = 5;
+  
   float costs[max_quantity_of_partitions];
+
+  int iter = 0;
 
   while(difference_max_min_cost > cost_threshold && num_partitions >= 5){
     num_partitions = 0;
+    std::cout<<iter<<std::endl;
     for(int i = min_partition_size_range; i<=max_partition_size_range; i+= step){
-      j=0;
-      this->universal_sorter(v, v_size, i, v_size);
-      this->operation_counter.print_operations_counter();
+      this->universal_sorter(v, v_size, i, v_size); 
+
+      costs[num_partitions] = this->calculate_cost();
+      this->print_statics(costs[num_partitions], i);
+
       num_partitions++;
       this->operation_counter.resetcounter();
     }
+    this->find_min_cost(costs);
+    iter++;
   }
 }
 
-void UniversalSorter::print_statics(){
+int UniversalSorter::find_min_cost(float *costs){
   
 }
+
+
 
 
 

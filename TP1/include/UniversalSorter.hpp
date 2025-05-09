@@ -1,6 +1,6 @@
 #include "OperationsCounter.hpp"
 
-typedef struct Statics{
+struct Statics{
     float cost;
 
 };
@@ -22,5 +22,7 @@ class UniversalSorter{
     void quickSort3Ins(int *A, int l, int r, int partition_threshold);
     void universal_sorter(int *vector, int vector_size, int min_partition_size, int breaks_threshold);
     int determine_partition_threshold (int *v, int v_size, int cost_threshold);
-    void print_statics();
+    void print_statics(int cost, int partition_size);
+    int find_min_cost(float *costs);
+    float calculate_cost ();
 };
