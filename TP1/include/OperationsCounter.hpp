@@ -1,3 +1,5 @@
+#ifndef OPERATIONS_COUNTER_HPP
+#define OPERATIONS_COUNTER_HPP
 #include <iostream>
 class OperationsCounter
 {
@@ -17,3 +19,5 @@ class OperationsCounter
     int get_calls();
     void print_operations_counter();
 };
+
+#endif

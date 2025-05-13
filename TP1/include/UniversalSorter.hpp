@@ -1,8 +1,22 @@
+#ifndef UNIVERSAL_SORTER_HPP
+#define UNIVERSAL_SORTER_HPP
 #include "OperationsCounter.hpp"
 #include "Sorter.hpp"
-struct Statics{
-    float cost;
 
+static const int max_quantity_of_partitions = 6;
+struct PartitionStatistics{
+    float cost;
+    int num_of_comparisons;
+    int num_of_calls;
+    int num_of_movements;
+    int partition_size;
+};
+struct BreaksStatistics{
+    float cost;
+    int num_of_comparisons;
+    int num_of_calls;
+    int num_of_movements;
+    int partition_size;
 };
 class UniversalSorter{
     private:
@@ -18,8 +32,8 @@ class UniversalSorter{
     int count_breaks(int *vet, int size);
     void universal_sorter(int *vector, int vector_size, int min_partition_size, int breaks_threshold);
     int determine_partition_threshold (int *v, int v_size, int cost_threshold);
-    void print_statics(float cost, int partition_size);
-    int find_min_cost(float *costs, int num_partitions);
+    void print_statics(Statistics statistics);
+    int find_min_cost(Statistics *statistics, int num_partitions);
     float calculate_cost ();
     void register_statistics(Statistics statistics [max_quantity_of_partitions], int num_partitions, int partition_size);
     void print_final_results(int num_partitions, int best_partition, float difference_max_min_cost);
@@ -29,3 +43,4 @@ class UniversalSorter{
     int determine_break_threshold(int partition_thershold, int* vet, int vet_size, int cost_threshold);
     void create_breaks(int *vet,int num_of_breaks, int vet_size);
 };
+#endif

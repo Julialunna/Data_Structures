@@ -1,3 +1,6 @@
+
+#ifndef SORTER_HPP
+#define SORTER_HPP
 #include "OperationsCounter.hpp"
 class Sorter{
     public:
@@ -7,3 +10,4 @@ class Sorter{
     void partition3(int *A, int l, int r, int *i, int *j, OperationsCounter *s);
     void quickSort3Ins(int *A, int l, int r, int partition_threshold, OperationsCounter *s);
 };
+#endif
