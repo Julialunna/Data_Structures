@@ -5,43 +5,49 @@
 #include <fstream>
 #include "UniversalSorter.hpp"
 
-int main()
+int main(int argc, char*argv[])
 {
 
-    float threshold_cost = 0, comparison_coefficient = 0, movimentation_coefficient = 0, call_coefficient = 0;
-    int seed = 1, num_of_keys = 0;
+    double threshold_cost = 0, comparison_coefficient = 0, movimentation_coefficient = 0, call_coefficient = 0;
+    int seed = 0, num_of_keys = 0;
     std::string file_name, line;
-    srand48(seed);
     
-    std::cin >> file_name;
-    //file_name = "entrada.txt";
-    std::ifstream file(file_name);
+    if (argc != 2) {
+        std::cerr << "Erro: file name needed" << std::endl;
+        return 1;
+    }
 
+   file_name = argv[1];
+
+    std::ifstream file(file_name);
+    
     if (!file) {
-        std::cerr << "Err ao abrir o arquivo.\n";
+        std::cerr << "Erro ao abrir o arquivo.\n";
         return 1;
     }
     
+    file >> seed;
     file >> threshold_cost;
     file >> comparison_coefficient;
     file >> movimentation_coefficient;
     file >> call_coefficient;
     file >> num_of_keys;
-
     
-    UniversalSorter *universal_sorter = new UniversalSorter(comparison_coefficient, movimentation_coefficient, call_coefficient);
-    int *vet = (int *)malloc(num_of_keys * sizeof(int));
-    for (int i = 0; i < num_of_keys; ++i)
-    {
-        vet[i] = static_cast<int>(drand48() * num_of_keys);
+    srand48(seed);
+    
+    UniversalSorter universal_sorter(comparison_coefficient, movimentation_coefficient, call_coefficient);
+    int *vet = new int[num_of_keys]; 
+
+    for(int i=0;i<num_of_keys;i++){
+        file >> vet[i];
     }
+    std::cout<<"size "<<num_of_keys<<" seed "<<seed<<" breaks "<<universal_sorter.count_breaks(vet, num_of_keys)<<std::endl;
+    //std::cout<<std::endl;
     
-    int partition_threshold = universal_sorter->determine_partition_threshold(vet, num_of_keys, threshold_cost);
-    int break_threshold = universal_sorter->determine_break_threshold(partition_threshold, vet, num_of_keys, threshold_cost);
-    
+    int partition_threshold = universal_sorter.determine_partition_threshold(vet, num_of_keys, threshold_cost);
+    universal_sorter.determine_break_threshold(partition_threshold, vet, num_of_keys, threshold_cost, seed);
 
-    free(vet);
-    delete(universal_sorter);
+    delete(vet);
     file.close();
 
     return 0;

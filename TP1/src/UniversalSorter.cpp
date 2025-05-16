@@ -1,13 +1,14 @@
 #include "UniversalSorter.hpp"
+#include <unistd.h>
 #include <cmath>
+#include <iomanip>
 // #include "OperationsCounter.hpp"
 
 // this function has a cost of O(n)! actually O(n-1) exactly
 
-
-UniversalSorter::UniversalSorter(float comp_coefficient,
-  float mov_coefficient, float call_coefficient) : comparison_coefficient(comp_coefficient), 
-  movimentation_coefficient(mov_coefficient), call_coefficient(call_coefficient) {}
+UniversalSorter::UniversalSorter(double comp_coefficient,
+                                 double mov_coefficient, double call_coefficient) : comparison_coefficient(comp_coefficient),
+                                                                                  movimentation_coefficient(mov_coefficient), call_coefficient(call_coefficient) {}
 
 // O(n)
 int UniversalSorter::count_breaks(int *vet, int size)
@@ -22,7 +23,6 @@ int UniversalSorter::count_breaks(int *vet, int size)
   }
   return result;
 }
-
 
 // O(1)
 void UniversalSorter::universal_sorter(int *v, int v_size, int min_partition_size, int breaks_threshold)
@@ -47,19 +47,20 @@ void UniversalSorter::universal_sorter(int *v, int v_size, int min_partition_siz
 }
 
 // O(1)
-float UniversalSorter::calculate_cost()
+double UniversalSorter::calculate_cost()
 {
-  float cost = this->comparison_coefficient * this->operation_counter.get_cmp() + this->movimentation_coefficient * this->operation_counter.get_move() + this->call_coefficient * this->operation_counter.get_calls();
+  double cost = this->comparison_coefficient * this->operation_counter.get_cmp() + this->movimentation_coefficient * this->operation_counter.get_move() + this->call_coefficient * this->operation_counter.get_calls();
   return cost;
 }
 
 // O(1)
-void UniversalSorter::print_statics(Statistics statistics)
+void UniversalSorter::print_partition_statics(PartitionStatistics *partition_statistics)
 {
-  std::cout << "mps " << statistics.partition_size << " cost " << statistics.cost << " cmp " << statistics.num_of_comparisons << " move " << statistics.num_of_movements<< " calls " << statistics.num_of_calls << std::endl;
+  std::cout << "mps " << partition_statistics->partition_size << " cost " << std::fixed << std::setprecision(9) << partition_statistics->cost << " cmp " << partition_statistics->num_of_comparisons << " move " << partition_statistics->num_of_movements << " calls " << partition_statistics->num_of_calls << std::endl;
 }
 
-void UniversalSorter::register_statistics(Statistics statistics [max_quantity_of_partitions], int num_partitions, int partition_size){
+void UniversalSorter::register_partition_statistics(PartitionStatistics statistics[max_quantity_of_partitions], int num_partitions, int partition_size)
+{
   statistics[num_partitions].cost = this->calculate_cost();
   statistics[num_partitions].num_of_calls = this->operation_counter.get_calls();
   statistics[num_partitions].num_of_comparisons = this->operation_counter.get_cmp();
@@ -68,14 +69,14 @@ void UniversalSorter::register_statistics(Statistics statistics [max_quantity_of
 }
 
 // O(1)
-void UniversalSorter::print_final_results(int num_partitions, int best_partition, float difference_max_min_cost)
+void UniversalSorter::print_final_results(int num_partitions, int best_partition, double difference_max_min_cost)
 {
 
-  std::cout << "nummps " << num_partitions << " lim particao " << best_partition << " mps diff " << difference_max_min_cost << std::endl;
+  std::cout << "nummps " << num_partitions << " limParticao " << best_partition << " mpsdiff " << std::fixed << std::setprecision(6) << difference_max_min_cost << std::endl;
 }
 
 // O(n)
-int UniversalSorter::find_min_cost(Statistics *statistics, int num_partitions)
+int UniversalSorter::find_min_cost(PartitionStatistics *statistics, int num_partitions)
 {
   int min_cost_index = 0;
   for (int i = 1; i < num_partitions; i++)
@@ -129,35 +130,39 @@ void UniversalSorter::find_new_range(int min_cost_index, int *min_size_range, in
 }
 
 // min partition size
-int UniversalSorter::determine_partition_threshold(int *v, int v_size, int cost_threshold)
+int UniversalSorter::determine_partition_threshold(int *v, int v_size, double cost_threshold)
 {
   int min_partition_size_range = 2, max_partition_size_range = v_size,
-  step = (max_partition_size_range - min_partition_size_range) / 5, num_partitions = 5, best_partition = 0, *v_copy = new int[v_size], min_cost_index =0;
+  step = (int)((max_partition_size_range - min_partition_size_range) / 5), best_partition = 0, *v_copy = new int[v_size], min_cost_index = 0, current_index = 0;
+  int num_partitions = this->find_index_by_partition(max_partition_size_range, min_partition_size_range, step) + 1;
 
   float difference_max_min_cost = cost_threshold + 1;
-  Statistics statistics [max_quantity_of_partitions];
+  PartitionStatistics *statistics;
 
   int iter = 0, i = 0;
 
   while (difference_max_min_cost > cost_threshold && num_partitions >= 5)
   {
 
-    num_partitions = 0;
+    num_partitions = this->find_index_by_partition(max_partition_size_range, min_partition_size_range, step) + 1;
+    current_index = 0;
+    statistics = new PartitionStatistics[num_partitions];
+    std::cout<<std::endl;
     std::cout << "iter " << iter << std::endl;
-
+    
     for (i = min_partition_size_range; i <= max_partition_size_range; i += step)
     {
       for (int j = 0; j < v_size; j++)
       {
         v_copy[j] = v[j];
       }
+
       this->universal_sorter(v_copy, v_size, i, 0);
 
-      
-      this->register_statistics(statistics, num_partitions, i);
-      this->print_statics(statistics[num_partitions]);
+      this->register_partition_statistics(statistics, current_index, i);
+      this->print_partition_statics(&statistics[current_index]);
 
-      num_partitions++;
+      current_index++;
       this->operation_counter.resetcounter();
     }
 
@@ -169,79 +174,136 @@ int UniversalSorter::determine_partition_threshold(int *v, int v_size, int cost_
     this->find_new_range(min_cost_index, &min_partition_size_range, &max_partition_size_range, num_partitions, &step);
 
     difference_max_min_cost = fabs(statistics[this->find_index_by_partition(max_partition_size_range, last_min_partition_size_range,
-    last_step)].cost -
-    statistics[this->find_index_by_partition(min_partition_size_range, last_min_partition_size_range,
-    last_step)].cost);
+                                                                            last_step)]
+                                       .cost -
+                                   statistics[this->find_index_by_partition(min_partition_size_range, last_min_partition_size_range,
+                                                                            last_step)]
+                                       .cost);
 
     this->print_final_results(num_partitions, best_partition, difference_max_min_cost);
     iter++;
+    delete[] statistics;
   }
+  delete[] v_copy;
   return best_partition;
 }
 
-void UniversalSorter::create_breaks(int *vet, int num_of_breaks, int vet_size)
+void UniversalSorter::shuffleVector(int *vet, int vet_size, int num_breaks, int seed)
 {
-  int breaks = 0, i = 0;
-  int new_index = vet_size - i - 1;
+  srand48(seed);
+  int index1 = 0, index2 = 0, temp;
 
-  while (breaks < num_of_breaks && i + 2 < vet_size)
+  for (int i = 0; i < num_breaks; i++)
   {
-    if (vet[i] != vet[i + 1])
+    while (index1 == index2)
     {
-      int temp = vet[i];
-      vet[i] = vet[i + 1];
-      vet[i + 1] = temp;
-      breaks++;
+      index1 = (int)(drand48() * vet_size);
+      index2 = (int)(drand48() * vet_size);
     }
-    i = i + 2;
+    if (index1 < vet_size && index2 < vet_size)
+    {
+      temp = vet[index1];
+      vet[index1] = vet[index2];
+      vet[index2] = temp;
+      index1 = index2 = 0;
+    }
   }
 }
+void UniversalSorter::print_statics_quick(BreaksStatistics breaks_statistics)
+{
+  std::cout << "qs lq " << breaks_statistics.num_breaks << " cost " << std::fixed << std::setprecision(9) << breaks_statistics.cost << " cmp " << breaks_statistics.num_of_comparisons << " move " << breaks_statistics.num_of_movements << " calls " << breaks_statistics.num_of_calls << std::endl;
+}
+void UniversalSorter::print_statics_insertion(BreaksStatistics breaks_statistics)
+{
+  std::cout << "in lq " << breaks_statistics.num_breaks << " cost " << std::fixed << std::setprecision(9) << breaks_statistics.cost << " cmp " << breaks_statistics.num_of_comparisons << " move " << breaks_statistics.num_of_movements << " calls " << breaks_statistics.num_of_calls << std::endl;
+}
 
-void print_statics_quick(int num_breaks, float cost){
+void UniversalSorter::register_break_statistics(BreaksStatistics *statistics_quick_sort, int num_breaks)
+{
+  statistics_quick_sort->cost = this->calculate_cost();
+  statistics_quick_sort->num_of_calls = this->operation_counter.get_calls();
+  statistics_quick_sort->num_of_comparisons = this->operation_counter.get_cmp();
+  statistics_quick_sort->num_of_movements = this->operation_counter.get_move();
+  statistics_quick_sort->num_breaks = num_breaks;
+}
+
+int UniversalSorter::find_min_cost_breaks(BreaksStatistics *statistics_quick_sort, BreaksStatistics *statistics_insertion_sort, int num_breaks)
+{
+  int min_cost_index = 0;
+  double difference = 0;
+  double best_difference = fabs(statistics_quick_sort[0].cost - statistics_insertion_sort[0].cost);
+
+  for (int i = 1; i < num_breaks; i++)
+  {
+    difference = fabs(statistics_quick_sort[i].cost - statistics_insertion_sort[i].cost);
+    if (best_difference > difference)
+    {
+      min_cost_index = i;
+      best_difference = difference;
+    }
+    
+  }
+  return min_cost_index;
+}
+
+void UniversalSorter::print_break_thershold_result(int partition_size, double difference_max_min_size, int num_size_breaks)
+{
+  std::cout << "numlq " << num_size_breaks << " limQuebras " << partition_size << " lqdiff " << std::fixed << std::setprecision(6) << difference_max_min_size << std::endl;
   
 }
 
-int UniversalSorter::determine_break_threshold(int partition_thershold, int *vet, int vet_size, int cost_threshold)
+void UniversalSorter::determine_break_threshold(int partition_thershold, int *vet, int vet_size, double cost_threshold, int seed)
 {
-  int min_num_breaks_range = 2, max_num_breaks_range = vet_size,
-  step = (max_num_breaks_range - min_num_breaks_range) / 5, num_breaks = 5, best_num_of_breaks = 0,
-  *vet_copy = new int[vet_size], iter = 0, i = 0,  min_cost_index = 0;
+  int min_num_breaks_range = 1, max_num_breaks_range = vet_size / 2,
+  step = (max_num_breaks_range - min_num_breaks_range) / 5, num_breaks = 5, iter = 0, i = 0, min_cost_index = 0, current_index = 0;
 
   float difference_max_min_cost = cost_threshold + 1;
 
-  Statistics statistics_quick_sort [max_quantity_of_partitions], statistics_insertion_sort [max_quantity_of_partitions];
+  BreaksStatistics *statistics_quick_sort, *statistics_insertion_sort;
 
-  for (int j = 0; j < vet_size; j++){
-    vet_copy[j] = vet[j];
-  }
+  this->universal_sorter(vet, vet_size, partition_thershold, 0);
+  this->operation_counter.resetcounter();
 
-  
+
   while (difference_max_min_cost > cost_threshold && num_breaks >= 5)
   {
-    num_breaks = 0;
-    std::cout << iter << std::endl;
+    num_breaks = this->find_index_by_partition(max_num_breaks_range, min_num_breaks_range, step) + 1;
+
+    std::cout<<std::endl;
+    current_index = 0;
+    std::cout << "iter "<<iter << std::endl;
+
+    statistics_insertion_sort = new BreaksStatistics[num_breaks];
+    statistics_quick_sort = new BreaksStatistics[num_breaks];
+
     for (i = min_num_breaks_range; i <= max_num_breaks_range; i += step)
     {
-      this->universal_sorter(vet_copy, vet_size, partition_thershold, 0);
-    
-      this->create_breaks(vet_copy, i, vet_size);
-
-      this->sorter.quickSort3Ins(vet_copy, 0, vet_size-1, partition_thershold, &this->operation_counter);
-      this->register_statistics(statistics_quick_sort, num_breaks, i);
+      this->shuffleVector(vet, vet_size, i, seed);
+      this->sorter.quickSort3Ins(vet, 0, vet_size - 1, partition_thershold, &this->operation_counter);
+      this->register_break_statistics(&statistics_quick_sort[current_index], i);
+      this->print_statics_quick(statistics_quick_sort[current_index]);
+      this->operation_counter.resetcounter();
       
-
-      num_breaks++;
+      this->shuffleVector(vet, vet_size, i, seed);
+      this->sorter.insertionSort(vet, 0, vet_size - 1, &this->operation_counter);
+      this->register_break_statistics(&statistics_insertion_sort[current_index], i);
+      this->print_statics_insertion(statistics_insertion_sort[current_index]);
+      this->operation_counter.resetcounter();
+      current_index++;
     }
-
+    
+    min_cost_index = this->find_min_cost_breaks(statistics_quick_sort, statistics_insertion_sort, num_breaks);
     int last_min_num_breaks_range = min_num_breaks_range;
     int last_step = step;
     this->find_new_range(min_cost_index, &min_num_breaks_range, &max_num_breaks_range, num_breaks, &step);
+    
+    difference_max_min_cost = fabs(statistics_insertion_sort[this->find_index_by_partition(max_num_breaks_range, last_min_num_breaks_range,
+    last_step)].cost -statistics_insertion_sort[this->find_index_by_partition(min_num_breaks_range, last_min_num_breaks_range,
+    last_step)].cost);
 
-    difference_max_min_cost = fabs(costs_insertionsort[this->find_index_by_partition(max_num_breaks_range, last_min_num_breaks_range,
-    last_step)] -
-    costs_insertionsort[this->find_index_by_partition(min_num_breaks_range, last_min_num_breaks_range,
-    last_step)]);
-
+    this->print_break_thershold_result(this->find_partition_size(min_cost_index, last_min_num_breaks_range, last_step), difference_max_min_cost, num_breaks);
+    delete[] statistics_insertion_sort;
+    delete[] statistics_quick_sort;
     iter++;
   }
 }

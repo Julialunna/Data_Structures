@@ -14,7 +14,6 @@ void Sorter::insertionSort(int v[], int l, int r, OperationsCounter *operation_c
     while (j >= 0 && round_item < v[j])
     {
       operation_counter->inccmp( 1);
-
       v[j + 1] = v[j];
       operation_counter->incmove( 1);
       j--;
@@ -25,16 +24,21 @@ void Sorter::insertionSort(int v[], int l, int r, OperationsCounter *operation_c
   return;
 }
 
-int Sorter::median(int a, int b, int c)
-{
+int Sorter::median(int a, int b, int c){
+
+
   if ((a <= b) && (b <= c))
     return b; // a b c
+  
   if ((a <= c) && (c <= b))
     return c; // a c b
+
   if ((b <= a) && (a <= c))
     return a; // b a c
+ 
   if ((b <= c) && (c <= a))
-    return c; // b c a
+    return c; // b c 
+  
   if ((c <= a) && (a <= b))
     return a; // c a b
   return b;   // c b a
@@ -50,6 +54,7 @@ void Sorter::swap(int *xp, int *yp, OperationsCounter *operation_counter){
 
 void Sorter::partition3(int *A, int l, int r, int *i, int *j, OperationsCounter *operation_counter){
  operation_counter->inccalls(1);
+
   int medium;
   *i = l;
   *j = r;
@@ -78,18 +83,18 @@ void Sorter::partition3(int *A, int l, int r, int *i, int *j, OperationsCounter 
   } while (*i <= *j);
 }
 
-// e se eu só usar asssim e deixar a decisão para o uso de insertion em quickSort3Ins em vez de no Ordenador universal? posso passar o limiar como parâmetro
-
 void Sorter::quickSort3Ins(int *A, int l, int r, int partition_threshold, OperationsCounter *operation_counter){
-    int i, j;
+  int i, j;
 
+  
   operation_counter->inccalls(1);
 
   this->partition3(A, l, r, &i, &j, operation_counter);
 
+
   if (l < j)
   {
-    if (j - l <= partition_threshold)
+    if (j - l < partition_threshold)
     {
       this->insertionSort(A, l, j, operation_counter);
     }
@@ -101,7 +106,7 @@ void Sorter::quickSort3Ins(int *A, int l, int r, int partition_threshold, Operat
 
   if (i < r)
   {
-    if (r - i <= partition_threshold)
+    if (r - i < partition_threshold)
     {
       this->insertionSort(A, i, r, operation_counter);
     }
@@ -111,4 +116,52 @@ void Sorter::quickSort3Ins(int *A, int l, int r, int partition_threshold, Operat
     }
   }
 
+}
+
+void Sorter::partition(int *A, int l, int r, int *i, int *j, OperationsCounter *operation_counter)
+{
+  operation_counter->inccalls(1);
+  int pivot;
+  *i = l;
+  *j = r;
+  pivot = A[(*i + *j) / 2];
+  do
+  {
+    while (pivot > A[*i])
+    {
+      operation_counter->inccmp(1);
+      (*i)++;
+    }
+    operation_counter->inccmp(1);
+    while (pivot < A[*j])
+    {
+      operation_counter->inccmp(1);
+      (*j)--;
+    }
+    operation_counter->inccmp(1);
+    
+    if (*i <= *j)
+    {
+      swap(&A[*i], &A[*j], operation_counter);
+      (*i)++;
+      (*j)--;
+    }
+  } while (*i <= *j);
+}
+
+void Sorter::quickSort(int *A, int l, int r, OperationsCounter  *operation_counter)
+{
+  int i, j;
+
+  operation_counter->inccalls( 1);
+
+  partition(A, l, r, &i, &j, operation_counter);
+  if (l < j)
+  {
+    quickSort(A, l, j, operation_counter);
+  }
+  if (i < r)
+  {
+    quickSort(A, i, r, operation_counter);
+  }
 }
