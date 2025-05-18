@@ -10,8 +10,7 @@ int main(int argc, char*argv[])
 
     double threshold_cost = 0, comparison_coefficient = 0, movimentation_coefficient = 0, call_coefficient = 0;
     int seed = 0, num_of_keys = 0;
-    //reading file
-    std::string file_name;
+    std::string file_name, line;
     
     if (argc != 2) {
         std::cerr << "Erro: file name needed" << std::endl;
@@ -23,7 +22,7 @@ int main(int argc, char*argv[])
     std::ifstream file(file_name);
     
     if (!file) {
-        std::cerr << "Erro ao abrir o arquivo.\n";
+        std::cerr << "Error opening file.\n";
         return 1;
     }
     
@@ -34,24 +33,20 @@ int main(int argc, char*argv[])
     file >> call_coefficient;
     file >> num_of_keys;
 
-    UniversalSorter universal_sorter(comparison_coefficient, movimentation_coefficient, call_coefficient, seed);
-    
+    UniversalSorter universal_sorter(comparison_coefficient, movimentation_coefficient, call_coefficient);
     int *vet = new int[num_of_keys]; 
-    
-    int key;
+
     for(int i=0;i<num_of_keys;i++){
-        file >> key;
-        vet[i] = key;
+        file >> vet[i];
     }
 
-    
     std::cout<<"size "<<num_of_keys<<" seed "<<seed<<" breaks "<<universal_sorter.count_breaks(vet, num_of_keys)<<std::endl;
     
     //calculating partition and break threshold
     int partition_threshold = universal_sorter.determine_partition_threshold(vet, num_of_keys, threshold_cost);
-    universal_sorter.determine_break_threshold(partition_threshold, vet, num_of_keys, threshold_cost);
+    universal_sorter.determine_break_threshold(partition_threshold, vet, num_of_keys, threshold_cost, seed);
 
-    delete(vet);
+    delete[] vet;
     file.close();
 
     return 0;
