@@ -2,13 +2,14 @@
 #include <unistd.h>
 #include <cmath>
 #include <iomanip>
-#include <stdlib.h>
 // #include "OperationsCounter.hpp"
 
+// this function has a cost of O(n)! actually O(n-1) exactly
 
 UniversalSorter::UniversalSorter(double comp_coefficient,
-                                 double mov_coefficient, double call_coefficient, int seed_received) : comparison_coefficient(comp_coefficient),
-                                                                                  movimentation_coefficient(mov_coefficient), call_coefficient(call_coefficient), seed(seed_received) {}
+                                 double mov_coefficient, double call_coefficient) : comparison_coefficient(comp_coefficient),
+                                                                                  movimentation_coefficient(mov_coefficient), call_coefficient(call_coefficient) {}
+
 
 //Function that counts how many times an item at the vector is bigger than its successor O(n)
 int UniversalSorter::count_breaks(int *vet, int size)
@@ -24,7 +25,7 @@ int UniversalSorter::count_breaks(int *vet, int size)
   return result;
 }
 
-//Function that decides which sorting algorithm is appropriate based on partition and breaks threshold O(1)
+//Function that decides which sorting algorithm is appropriate based on partition and breaks threshold,pior caso O(n²)
 void UniversalSorter::universal_sorter(int *v, int v_size, int min_partition_size, int breaks_threshold)
 {
   int num_breaks = this->count_breaks(v, v_size);
@@ -46,6 +47,19 @@ void UniversalSorter::universal_sorter(int *v, int v_size, int min_partition_siz
   }
 }
 
+//Calculates cost based on number of comparisons, movimentatios, calls and its coefficients O(1)
+double UniversalSorter::calculate_cost()
+{
+  double cost = this->comparison_coefficient * this->operation_counter.get_cmp() + this->movimentation_coefficient * this->operation_counter.get_move() + this->call_coefficient * this->operation_counter.get_calls();
+  return cost;
+}
+
+//Print statics of each partition size tested O(1)
+void UniversalSorter::print_partition_statics(PartitionStatistics *partition_statistics)
+{
+  std::cout << "mps " << partition_statistics->partition_size << " cost " << std::fixed << std::setprecision(9) << partition_statistics->cost << " cmp " << partition_statistics->num_of_comparisons << " move " << partition_statistics->num_of_movements << " calls " << partition_statistics->num_of_calls << std::endl;
+}
+
 // Register the cost, number of comparisons, calls and movements of each partition size tested 
 void UniversalSorter::register_partition_statistics(PartitionStatistics statistics[max_quantity_of_partitions], int num_partitions, int partition_size)
 {
@@ -56,25 +70,13 @@ void UniversalSorter::register_partition_statistics(PartitionStatistics statisti
   statistics[num_partitions].partition_size = partition_size;
 }
 
-//Print statics of each partition size tested O(1)
-void UniversalSorter::print_partition_statics(PartitionStatistics *partition_statistics)
-{
-  std::cout << "mps " << partition_statistics->partition_size << " cost " << std::fixed << std::setprecision(9) << partition_statistics->cost << " cmp " << partition_statistics->num_of_comparisons << " move " << partition_statistics->num_of_movements << " calls " << partition_statistics->num_of_calls << std::endl;
-}
-
 //Print the number of partitions sizes tested and the partition whose cost was the best O(1)
 void UniversalSorter::print_final_results(int num_partitions, int best_partition, double difference_max_min_cost)
 {
-  
+
   std::cout << "nummps " << num_partitions << " limParticao " << best_partition << " mpsdiff " << std::fixed << std::setprecision(6) << difference_max_min_cost << std::endl;
 }
 
-//Calculates cost based on number of comparisons, movimentatios, calls and its coefficients O(1)
-double UniversalSorter::calculate_cost()
-{
-  double cost = this->comparison_coefficient * this->operation_counter.get_cmp() + this->movimentation_coefficient * this->operation_counter.get_move() + this->call_coefficient * this->operation_counter.get_calls();
-  return cost;
-}
 //Find the minimun cost of the partition sizes tested O(number of partitions tested)
 int UniversalSorter::find_min_cost(PartitionStatistics *statistics, int num_partitions)
 {
@@ -88,16 +90,16 @@ int UniversalSorter::find_min_cost(PartitionStatistics *statistics, int num_part
   }
   return min_cost_index;
 }
-//Function that find the partion size/number of breaks from index 
-int UniversalSorter::find_index_by_partition(int partition_size, int min_partition_size, int step)
-{
-  return (partition_size - min_partition_size) / step;
-}
-
 //Find the partition size using the correspondent index 
 int UniversalSorter::find_partition_size(int index, int min_partition_size, int step)
 {
   return min_partition_size + index * step;
+}
+
+//Function that find the partion size/number of breaks from index 
+int UniversalSorter::find_index_by_partition(int partition_size, int min_partition_size, int step)
+{
+  return (partition_size - min_partition_size) / step;
 }
 
 //Function that finds new range of values to test minimum partitions sizes / minimum number of breaks
@@ -140,11 +142,8 @@ void UniversalSorter::find_new_range(int min_cost_index, int *min_size_range, in
 int UniversalSorter::determine_partition_threshold(int *v, int v_size, double cost_threshold)
 {
   int min_partition_size_range = 2, max_partition_size_range = v_size,
-  step = (int)((max_partition_size_range - min_partition_size_range) / 5), 
-  best_partition = 0, *v_copy = new int[v_size], 
-  min_cost_index = 0, 
-  current_index = 0, 
-  num_partitions = 5;
+  step = (int)((max_partition_size_range - min_partition_size_range) / 5), best_partition = 0, *v_copy = new int[v_size], min_cost_index = 0, current_index = 0;
+  int num_partitions = this->find_index_by_partition(max_partition_size_range, min_partition_size_range, step) + 1;
 
   float difference_max_min_cost = cost_threshold + 1;
   PartitionStatistics *statistics;
@@ -157,37 +156,39 @@ int UniversalSorter::determine_partition_threshold(int *v, int v_size, double co
     num_partitions = this->find_index_by_partition(max_partition_size_range, min_partition_size_range, step) + 1;
     current_index = 0;
     statistics = new PartitionStatistics[num_partitions];
-
     std::cout<<std::endl;
     std::cout << "iter " << iter << std::endl;
     
     for (i = min_partition_size_range; i <= max_partition_size_range; i += step)
     {
-      //copy the original vector to a temporary vector to facilitate resetting for each partition size test
+       //copy the original vector to a temporary vector to facilitate resetting for each partition size test
       for (int j = 0; j < v_size; j++)
       {
         v_copy[j] = v[j];
       }
 
       this->universal_sorter(v_copy, v_size, i, 0);
+
       this->register_partition_statistics(statistics, current_index, i);
       this->print_partition_statics(&statistics[current_index]);
 
       current_index++;
       this->operation_counter.resetcounter();
     }
-
     //find the tested partition with the lowest cost 
     min_cost_index = this->find_min_cost(statistics, num_partitions);
-    best_partition = statistics[min_cost_index].partition_size;
+    best_partition = this->find_partition_size(min_cost_index, min_partition_size_range, step);
 
     int last_min_partition_size_range = min_partition_size_range;
     int last_step = step;
     this->find_new_range(min_cost_index, &min_partition_size_range, &max_partition_size_range, num_partitions, &step);
 
-    difference_max_min_cost = 
-    fabs(statistics[this->find_index_by_partition(max_partition_size_range, last_min_partition_size_range,last_step)].cost 
-    -statistics[this->find_index_by_partition(min_partition_size_range, last_min_partition_size_range, last_step)].cost);
+    difference_max_min_cost = fabs(statistics[this->find_index_by_partition(max_partition_size_range, last_min_partition_size_range,
+                                                                            last_step)]
+                                       .cost -
+                                   statistics[this->find_index_by_partition(min_partition_size_range, last_min_partition_size_range,
+                                                                            last_step)]
+                                       .cost);
 
     this->print_final_results(num_partitions, best_partition, difference_max_min_cost);
     iter++;
@@ -198,10 +199,9 @@ int UniversalSorter::determine_partition_threshold(int *v, int v_size, double co
 }
 
 //function that creates breaks on a sorted vector, O(num of breaks)
-void UniversalSorter::shuffleVector(int *vet, int vet_size, int num_breaks)
+void UniversalSorter::shuffleVector(int *vet, int vet_size, int num_breaks, int seed)
 {
-  srand48(this->seed);
-  
+  srand48(seed);
   int index1 = 0, index2 = 0, temp;
 
   for (int i = 0; i < num_breaks; i++)
@@ -211,13 +211,13 @@ void UniversalSorter::shuffleVector(int *vet, int vet_size, int num_breaks)
       index1 = (int)(drand48() * vet_size);
       index2 = (int)(drand48() * vet_size);
     }
-    
-
+    if (index1 < vet_size && index2 < vet_size)
+    {
       temp = vet[index1];
       vet[index1] = vet[index2];
       vet[index2] = temp;
       index1 = index2 = 0;
-
+    }
   }
 }
 
@@ -241,7 +241,7 @@ void UniversalSorter::register_break_statistics(BreaksStatistics *statistics_qui
   statistics_quick_sort->num_breaks = num_breaks;
 }
 //finds the number of breaks where the cost of insertion sort and quicksort is most similar, O(1)
-int UniversalSorter::find_num_breaks_with_min_cost_difference(BreaksStatistics *statistics_quick_sort, BreaksStatistics *statistics_insertion_sort, int num_breaks)
+int UniversalSorter::find_min_cost_breaks(BreaksStatistics *statistics_quick_sort, BreaksStatistics *statistics_insertion_sort, int num_breaks)
 {
   int min_cost_index = 0;
   double difference = 0;
@@ -259,31 +259,29 @@ int UniversalSorter::find_num_breaks_with_min_cost_difference(BreaksStatistics *
   }
   return min_cost_index;
 }
-
 //prints the final result with the numer of breaks whose cost is similiar to quicksort cost, O(1)
-void UniversalSorter::print_break_threshold_result(int num_breaks, double difference_max_min_size, int num_size_breaks)
+void UniversalSorter::print_break_thershold_result(int partition_size, double difference_max_min_size, int num_size_breaks)
 {
-  std::cout << "numlq " << num_size_breaks << " limQuebras " << num_breaks << " lqdiff " << std::fixed << std::setprecision(6) << difference_max_min_size << std::endl;
+  std::cout << "numlq " << num_size_breaks << " limQuebras " << partition_size << " lqdiff " << std::fixed << std::setprecision(6) << difference_max_min_size << std::endl;
   
 }
 
 //determine the number of breaks at the for which is better to use insertion sort than quicksort, O(n²log(n))
 //memory complexity O(1)
-void UniversalSorter::determine_break_threshold(int partition_threshold, int *vet, int vet_size, double cost_threshold)
+void UniversalSorter::determine_break_threshold(int partition_thershold, int *vet, int vet_size, double cost_threshold, int seed)
 {
   int min_num_breaks_range = 1, max_num_breaks_range = vet_size / 2,
-  step = (int)((max_num_breaks_range - min_num_breaks_range) / 5), 
-  num_breaks = 5, 
-  iter = 0, min_cost_index = 0, current_index = 0;
+  step = (int)(max_num_breaks_range - min_num_breaks_range) / 5, num_breaks = 5, iter = 0, i = 0, min_cost_index = 0, current_index = 0;
 
   float difference_max_min_cost = cost_threshold + 1;
 
-  this->universal_sorter(vet, vet_size, partition_threshold, 0);
-  this->operation_counter.resetcounter();
-
   BreaksStatistics *statistics_quick_sort, *statistics_insertion_sort;
 
-  while ((difference_max_min_cost > cost_threshold) && (num_breaks >= 5))
+  this->universal_sorter(vet, vet_size, partition_thershold, 0);
+  this->operation_counter.resetcounter();
+
+
+  while (difference_max_min_cost > cost_threshold && num_breaks >= 5)
   {
     num_breaks = this->find_index_by_partition(max_num_breaks_range, min_num_breaks_range, step) + 1;
 
@@ -294,26 +292,25 @@ void UniversalSorter::determine_break_threshold(int partition_threshold, int *ve
     statistics_insertion_sort = new BreaksStatistics[num_breaks];
     statistics_quick_sort = new BreaksStatistics[num_breaks];
 
-    for (int i = min_num_breaks_range; i <= max_num_breaks_range; i += step)
+    for (i = min_num_breaks_range; i <= max_num_breaks_range; i += step)
     {
       //use sorted vet and create breaks to test it with quicksort
-      this->shuffleVector(vet, vet_size, i);
-      this->sorter.quickSort3Ins(vet, 0, vet_size - 1, partition_threshold, &this->operation_counter);
+      this->shuffleVector(vet, vet_size, i, seed);
+      this->sorter.quickSort3Ins(vet, 0, vet_size - 1, partition_thershold, &this->operation_counter);
       this->register_break_statistics(&statistics_quick_sort[current_index], i);
       this->print_statics_quick(statistics_quick_sort[current_index]);
       this->operation_counter.resetcounter();
-
-      //use sorted and create breaks to test it with insertionsort
-      this->shuffleVector(vet, vet_size, i);
+      
+       //use sorted and create breaks to test it with insertionsort
+      this->shuffleVector(vet, vet_size, i, seed);
       this->sorter.insertionSort(vet, 0, vet_size - 1, &this->operation_counter);
       this->register_break_statistics(&statistics_insertion_sort[current_index], i);
       this->print_statics_insertion(statistics_insertion_sort[current_index]);
       this->operation_counter.resetcounter();
       current_index++;
     }
-    
     //finds best number of breaks tested
-    min_cost_index = this->find_num_breaks_with_min_cost_difference(statistics_quick_sort, statistics_insertion_sort, num_breaks);
+    min_cost_index = this->find_min_cost_breaks(statistics_quick_sort, statistics_insertion_sort, num_breaks);
     int last_min_num_breaks_range = min_num_breaks_range;
     int last_step = step;
     this->find_new_range(min_cost_index, &min_num_breaks_range, &max_num_breaks_range, num_breaks, &step);
@@ -322,7 +319,7 @@ void UniversalSorter::determine_break_threshold(int partition_threshold, int *ve
     last_step)].cost -statistics_insertion_sort[this->find_index_by_partition(min_num_breaks_range, last_min_num_breaks_range,
     last_step)].cost);
 
-    this->print_break_threshold_result(statistics_insertion_sort[min_cost_index].num_breaks, difference_max_min_cost, num_breaks);
+    this->print_break_thershold_result(this->find_partition_size(min_cost_index, last_min_num_breaks_range, last_step), difference_max_min_cost, num_breaks);
     delete[] statistics_insertion_sort;
     delete[] statistics_quick_sort;
     iter++;

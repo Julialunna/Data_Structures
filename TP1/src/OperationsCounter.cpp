@@ -24,19 +24,15 @@ void OperationsCounter::inccalls(int num)
 {
     this->calls += num;
 }
-
+//increments number of comparisons
 int OperationsCounter::get_cmp(){
     return this->cmp;
 }
+//increments number of movements
 int OperationsCounter::get_move(){
     return this->move;
 }
+//increments number of calls
 int OperationsCounter::get_calls(){
     return this->calls;
-}
-
-void OperationsCounter::print_operations_counter()
-{
-
-    std::cout << this->cmp << " " << this->move << " " << this->calls << std::endl;
 }

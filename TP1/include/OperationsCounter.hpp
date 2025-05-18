@@ -17,7 +17,7 @@ class OperationsCounter
     int get_cmp();
     int get_move();
     int get_calls();
-    void print_operations_counter();
+
 };
 
 #endif

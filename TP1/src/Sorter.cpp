@@ -1,5 +1,7 @@
 #include "Sorter.hpp"
 #include "OperationsCounter.hpp"
+
+//sort vector using insertionsort algorithm
 void Sorter::insertionSort(int v[], int l, int r, OperationsCounter *operation_counter)
 {
   int j;
@@ -83,6 +85,7 @@ void Sorter::partition3(int *A, int l, int r, int *i, int *j, OperationsCounter 
   } while (*i <= *j);
 }
 
+//sort vector using quick sort algorith with median of 3 and using insertion sort to partitions whose size is lower than partition threshold
 void Sorter::quickSort3Ins(int *A, int l, int r, int partition_threshold, OperationsCounter *operation_counter){
   int i, j;
 
@@ -116,52 +119,4 @@ void Sorter::quickSort3Ins(int *A, int l, int r, int partition_threshold, Operat
     }
   }
 
-}
-
-void Sorter::partition(int *A, int l, int r, int *i, int *j, OperationsCounter *operation_counter)
-{
-  operation_counter->inccalls(1);
-  int pivot;
-  *i = l;
-  *j = r;
-  pivot = A[(*i + *j) / 2];
-  do
-  {
-    while (pivot > A[*i])
-    {
-      operation_counter->inccmp(1);
-      (*i)++;
-    }
-    operation_counter->inccmp(1);
-    while (pivot < A[*j])
-    {
-      operation_counter->inccmp(1);
-      (*j)--;
-    }
-    operation_counter->inccmp(1);
-    
-    if (*i <= *j)
-    {
-      swap(&A[*i], &A[*j], operation_counter);
-      (*i)++;
-      (*j)--;
-    }
-  } while (*i <= *j);
-}
-
-void Sorter::quickSort(int *A, int l, int r, OperationsCounter  *operation_counter)
-{
-  int i, j;
-
-  operation_counter->inccalls( 1);
-
-  partition(A, l, r, &i, &j, operation_counter);
-  if (l < j)
-  {
-    quickSort(A, l, j, operation_counter);
-  }
-  if (i < r)
-  {
-    quickSort(A, i, r, operation_counter);
-  }
 }
