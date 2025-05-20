@@ -16,69 +16,62 @@ struct DataPoint
     double cost;
 };
 
-void regressao_linear(DataPoint *data, int n, double *a, double *b, double *c)
+#define NUM_DATA 3
+
+void linear_regression(DataPoint *data, int n, double *a, double *b, double *c)
 {
-    double sum_cmp = 0, sum_move = 0, sum_calls = 0, sum_cost = 0;
-    double sum_cmp2 = 0, sum_move2 = 0, sum_calls2 = 0;
-    double sum_cmp_move = 0, sum_cmp_calls = 0, sum_move_calls = 0;
-    double sum_cmp_cost = 0, sum_move_cost = 0, sum_calls_cost = 0;
-
-    for (int i = 0; i < n; ++i)
-    {
-        sum_cmp += data[i].cmp;
-        sum_move += data[i].move;
-        sum_calls += data[i].calls;
-        sum_cost += data[i].cost;
-
-        sum_cmp2 += data[i].cmp * data[i].cmp;
-        sum_move2 += data[i].move * data[i].move;
-        sum_calls2 += data[i].calls * data[i].calls;
-
-        sum_cmp_move += data[i].cmp * data[i].move;
-        sum_cmp_calls += data[i].cmp * data[i].calls;
-        sum_move_calls += data[i].move * data[i].calls;
-
-        sum_cmp_cost += data[i].cmp * data[i].cost;
-        sum_move_cost += data[i].move * data[i].cost;
-        sum_calls_cost += data[i].calls * data[i].cost;
+    // Monta matriz A (n x 3) e vetor y
+    long double* A = new long double[n*3];
+    long double* y = new long double[n];
+    for(int i=0;i<n;++i) {
+        A[i*3 + 0] = data[i].cmp;
+        A[i*3 + 1] = data[i].move;
+        A[i*3 + 2] = data[i].calls;
+        y[i]      = data[i].cost;
     }
+    // Q (n x 3) e R (3 x 3)
+    long double* Q = new long double[n*3];
+    long double R[3][3] = {{0}};
 
-    // Monta o sistema de equacoes normais: A * X = B
-    double A[3][3] = {
-        {sum_cmp2, sum_cmp_move, sum_cmp_calls},
-        {sum_cmp_move, sum_move2, sum_move_calls},
-        {sum_cmp_calls, sum_move_calls, sum_calls2}};
-
-    double B[3] = {sum_cmp_cost, sum_move_cost, sum_calls_cost};
-
-    // Resolve sistema linear com eliminacao de Gauss
-    double M[3][4];
-    for (int i = 0; i < 3; ++i)
-    {
-        for (int j = 0; j < 3; ++j)
-            M[i][j] = A[i][j];
-        M[i][3] = B[i];
-    }
-
-    for (int i = 0; i < 3; ++i)
-    {
-        double pivot = M[i][i];
-        for (int j = 0; j < 4; ++j)
-            M[i][j] /= pivot;
-
-        for (int k = 0; k < 3; ++k)
-        {
-            if (k == i)
-                continue;
-            double factor = M[k][i];
-            for (int j = 0; j < 4; ++j)
-                M[k][j] -= factor * M[i][j];
+    // Gram-Schmidt
+    for(int j=0;j<3;++j) {
+        // v = A[:,j]
+        long double* v = new long double[n];
+        for(int i=0;i<n;++i) v[i] = A[i*3 + j];
+        // Subtrai projeções
+        for(int k=0;k<j;++k) {
+            long double dot=0;
+            for(int i=0;i<n;++i) dot += Q[i*3 + k] * A[i*3 + j];
+            R[k][j] = dot;
+            for(int i=0;i<n;++i) v[i] -= dot * Q[i*3 + k];
         }
+        // Norm
+        long double norm=0;
+        for(int i=0;i<n;++i) norm += v[i]*v[i];
+        norm = std::sqrt(norm);
+        R[j][j] = norm;
+        // Q[:,j] = v / norm
+        for(int i=0;i<n;++i) Q[i*3 + j] = v[i]/norm;
+        delete[] v;
     }
-
-    *a = M[0][3];
-    *b = M[1][3];
-    *c = M[2][3];
+    // Compute Qt * y
+    long double Qt_y[3] = {0};
+    for(int j=0;j<3;++j) {
+        long double sum=0;
+        for(int i=0;i<n;++i) sum += Q[i*3 + j] * y[i];
+        Qt_y[j] = sum;
+    }
+    // Solve R x = Qt_y by back substitution
+    long double x[3] = {0};
+    for(int i=2;i>=0;--i) {
+        long double s = Qt_y[i];
+        for(int j=i+1;j<3;++j) s -= R[i][j] * x[j];
+        x[i] = s / R[i][i];
+    }
+    *a = (double)x[0];
+    *b = (double)x[1];
+    *c = (double)x[2];
+    delete[] A; delete[] Q; delete[] y;
 }
 
 void copy_vet(item vet[VETSIZE], item vet_copy[VETSIZE])
@@ -107,7 +100,7 @@ int main()
     item vet[VETSIZE], vet_copy[VETSIZE];
     UniversalSorter universal_sorter(0.0121560, -0.0063780, 0.0172897);
 
-    DataPoint *data = new DataPoint[3];
+    DataPoint *data = new DataPoint[NUM_DATA];
 
     for (i = 0; i < VETSIZE; i++)
     {
@@ -124,23 +117,23 @@ int main()
     }
 
     double a = 0, b = 0, c = 0;
-    double cost0 = 0, cost2 = 0, cost3 = 0;
+    double cost0 = 0, cost1 = 0, cost2 = 0;
 
     copy_vet(vet, vet_copy);
     cost0 = medir_tempo_ms([&]()
                            { universal_sorter.get_sorter().quickSort3Ins(vet_copy, 0, VETSIZE - 1, 5, universal_sorter.get_operation_counter()); });
     data[0] = {universal_sorter.get_operation_counter()->get_cmp(), universal_sorter.get_operation_counter()->get_move(), universal_sorter.get_operation_counter()->get_calls(), cost0};
     universal_sorter.get_operation_counter()->resetcounter();
-    cost2 = medir_tempo_ms([&]()
+    cost1 = medir_tempo_ms([&]()
                            { universal_sorter.get_sorter().quickSort3Ins(vet_copy, 0, (VETSIZE / 2) - 1, 5, universal_sorter.get_operation_counter()); });
-    data[1] = {universal_sorter.get_operation_counter()->get_cmp(), universal_sorter.get_operation_counter()->get_move(), universal_sorter.get_operation_counter()->get_calls(), cost2};
+    data[1] = {universal_sorter.get_operation_counter()->get_cmp(), universal_sorter.get_operation_counter()->get_move(), universal_sorter.get_operation_counter()->get_calls(), cost1};
     universal_sorter.get_operation_counter()->resetcounter();
-    cost3 = medir_tempo_ms([&]()
+    cost2 = medir_tempo_ms([&]()
                            { universal_sorter.get_sorter().quickSort3Ins(vet_copy, 0, (VETSIZE / 3) - 1, 5, universal_sorter.get_operation_counter()); });
-    data[2] = {universal_sorter.get_operation_counter()->get_cmp(), universal_sorter.get_operation_counter()->get_move(), universal_sorter.get_operation_counter()->get_calls(), cost3};
+    data[2] = {universal_sorter.get_operation_counter()->get_cmp(), universal_sorter.get_operation_counter()->get_move(), universal_sorter.get_operation_counter()->get_calls(), cost2};
     universal_sorter.get_operation_counter()->resetcounter();
 
-    regressao_linear(data, 3, &a, &b, &c);
+    linear_regression(data, NUM_DATA, &a, &b, &c);
     int partition_threshold = universal_sorter.determine_partition_threshold(vet, VETSIZE, 10.000000);
     universal_sorter.determine_break_threshold(partition_threshold, vet, VETSIZE, 10.000000, 1);
     for(int t=0;t<3;t++){
