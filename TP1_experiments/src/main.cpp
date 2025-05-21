@@ -7,6 +7,8 @@
 #include <tuple>
 #include <iomanip>
 #include "UniversalSorter.hpp"
+#include "Sorter.hpp"
+#include"OperationsCounter.hpp"
 
 struct DataPoint
 {
@@ -18,7 +20,7 @@ struct DataPoint
 
 #define NUM_DATA 3
 
-void linear_regression(DataPoint *data, int n, double *a, double *b, double *c)
+void linear_regression_qr(DataPoint *data, int n, double *a, double *b, double *c)
 {
     // Monta matriz A (n x 3) e vetor y
     long double* A = new long double[n*3];
@@ -92,16 +94,36 @@ double medir_tempo_ms(Func func)
     return duration.count();
 }
 
+void create_disorder(UniversalSorter universal_sorter, item *vet, int break_threshold, int partition_threshold){
+    if(VETDISORDER == 100){
+        for(int i =0;i<VETSIZE/2;i++){
+            vet[0] = vet[VETSIZE - i - 1];
+        }
+    }else if(VETDISORDER == 40){
+        universal_sorter.shuffleVector(vet, VETSIZE, 0.4 * VETSIZE, 1);
+    }else if(VETDISORDER == 60){
+        universal_sorter.shuffleVector(vet, VETSIZE, 0.6 * VETSIZE, 1);
+    }else if(VETDISORDER !=0){
+        std::cerr<<"No valid disorder"<<std::endl;
+    }
+}
+
+float calculate_cost(OperationsCounter operation_counter, double comparison_coefficient, double movement_coefficient, double call_coefficient){
+    return (operation_counter.get_cmp() * comparison_coefficient + operation_counter.get_move() * movement_coefficient + operation_counter.get_calls() * call_coefficient);
+}
+
 int main()
 {
     int i, j, p;
     long mult = (long)pow(10, KEYSIZE - 1);
     srand48(1);
     item vet[VETSIZE], vet_copy[VETSIZE];
-    UniversalSorter universal_sorter(0.0121560, -0.0063780, 0.0172897);
-
+    OperationsCounter operation_counter;
+    Sorter sorting_algorithms;
+    
     DataPoint *data = new DataPoint[NUM_DATA];
 
+    //creating vector 
     for (i = 0; i < VETSIZE; i++)
     {
         for (j = (int)(drand48() * mult), p = KEYSIZE - 2; p >= 0; j /= 10, p--)
@@ -116,28 +138,55 @@ int main()
         vet[i].payload[REGISTERSIZE - 1] = 0;
     }
 
-    double a = 0, b = 0, c = 0;
+    double comparison_coefficient = 0, movement_coefficient = 0, call_coefficient = 0;
     double cost0 = 0, cost1 = 0, cost2 = 0;
 
+    //calculating comparison, movements and calls cost
     copy_vet(vet, vet_copy);
-    cost0 = medir_tempo_ms([&]()
-                           { universal_sorter.get_sorter().quickSort3Ins(vet_copy, 0, VETSIZE - 1, 5, universal_sorter.get_operation_counter()); });
-    data[0] = {universal_sorter.get_operation_counter()->get_cmp(), universal_sorter.get_operation_counter()->get_move(), universal_sorter.get_operation_counter()->get_calls(), cost0};
-    universal_sorter.get_operation_counter()->resetcounter();
-    cost1 = medir_tempo_ms([&]()
-                           { universal_sorter.get_sorter().quickSort3Ins(vet_copy, 0, (VETSIZE / 2) - 1, 5, universal_sorter.get_operation_counter()); });
-    data[1] = {universal_sorter.get_operation_counter()->get_cmp(), universal_sorter.get_operation_counter()->get_move(), universal_sorter.get_operation_counter()->get_calls(), cost1};
-    universal_sorter.get_operation_counter()->resetcounter();
-    cost2 = medir_tempo_ms([&]()
-                           { universal_sorter.get_sorter().quickSort3Ins(vet_copy, 0, (VETSIZE / 3) - 1, 5, universal_sorter.get_operation_counter()); });
-    data[2] = {universal_sorter.get_operation_counter()->get_cmp(), universal_sorter.get_operation_counter()->get_move(), universal_sorter.get_operation_counter()->get_calls(), cost2};
-    universal_sorter.get_operation_counter()->resetcounter();
+    cost0 = medir_tempo_ms([&](){ sorting_algorithms.quickSort3Ins(vet_copy, 0, VETSIZE - 1, 5, &operation_counter);});
 
-    linear_regression(data, NUM_DATA, &a, &b, &c);
-    int partition_threshold = universal_sorter.determine_partition_threshold(vet, VETSIZE, 10.000000);
-    universal_sorter.determine_break_threshold(partition_threshold, vet, VETSIZE, 10.000000, 1);
-    for(int t=0;t<3;t++){
-        std::cout<<data[t].cmp<<" "<<data[t].move<<" "<<data[t].calls<<" "<<data[t].cost<<std::endl;
-    }
-    std::cout << a << " " << b << " " << c << std::endl;
+    data[0] = {operation_counter.get_cmp(), operation_counter.get_move(), operation_counter.get_calls(), cost0};
+    operation_counter.resetcounter();
+    
+    copy_vet(vet, vet_copy);
+    cost1 = medir_tempo_ms([&](){ sorting_algorithms.quickSort3Ins(vet_copy, 0, (VETSIZE/2) - 1, 5, &operation_counter);});
+    data[1] = {operation_counter.get_cmp(), operation_counter.get_move(), operation_counter.get_calls(), cost1};
+    operation_counter.resetcounter();
+    
+    copy_vet(vet, vet_copy);
+    cost2 = medir_tempo_ms([&](){ sorting_algorithms.quickSort3Ins(vet_copy, 0, (VETSIZE/3) - 1, 5, &operation_counter); });
+    data[2] = {operation_counter.get_cmp(), operation_counter.get_move(), operation_counter.get_calls(), cost2};
+    std::cout<<operation_counter.get_cmp()<<" "<< operation_counter.get_move()<<" "<< operation_counter.get_calls()<<" "<< cost2<<" "<<std::endl;
+    operation_counter.resetcounter();
+    
+    linear_regression_qr(data, NUM_DATA, &comparison_coefficient, &movement_coefficient, &call_coefficient);
+    
+    UniversalSorter universal_sorter(comparison_coefficient, movement_coefficient, call_coefficient);
+    
+    double cost_threshold = 10.000000;
+    int partition_threshold = universal_sorter.determine_partition_threshold(vet, VETSIZE, cost_threshold);
+    int break_threshold = universal_sorter.determine_break_threshold(partition_threshold, vet, VETSIZE, cost_threshold, 1);
+
+    universal_sorter.universal_sorter(vet, VETSIZE, partition_threshold, break_threshold);
+
+    create_disorder(universal_sorter, vet, break_threshold, partition_threshold);
+    
+    std::cout<<"cmp: "<<comparison_coefficient<<" move: "<<movement_coefficient<<" call: "<< call_coefficient<<std::endl;
+    std::cout<<"KEYSIZE: "<<KEYSIZE<<" REGISTERSIZE: "<<REGISTERSIZE<<" VETSIZE: "<<VETSIZE<<" VETDISORDER: "<<VETDISORDER<<std::endl;
+    copy_vet(vet, vet_copy);
+    universal_sorter.get_operation_counter()->resetcounter();
+    universal_sorter.universal_sorter(vet_copy, VETSIZE, partition_threshold, break_threshold);
+    float cost_universal_sorter = universal_sorter.calculate_cost();
+    std::cout<<"Universal Sorter: "<<cost_universal_sorter<<" cmp: "<< universal_sorter.get_operation_counter()->get_cmp()<<" move: "<<universal_sorter.get_operation_counter()->get_move()<<" call: "<< universal_sorter.get_operation_counter()->get_calls()<<std::endl;
+
+    copy_vet(vet, vet_copy);
+    sorting_algorithms.quickSort3Ins(vet_copy, 0 , VETSIZE-1, partition_threshold, &operation_counter);
+    float cost_quick_sort = calculate_cost(operation_counter, comparison_coefficient, movement_coefficient, call_coefficient); 
+    std::cout<<"Quick Sort: "<<cost_quick_sort<<" cmp: "<< operation_counter.get_cmp()<<" move: "<<operation_counter.get_move()<<" call: "<< operation_counter.get_calls()<<std::endl;
+
+    operation_counter.resetcounter();
+    sorting_algorithms.insertionSort(vet_copy, 0, VETSIZE-1, &operation_counter);
+    float cost_insertion_sort = calculate_cost(operation_counter, comparison_coefficient, movement_coefficient, call_coefficient);
+     std::cout<<"Insertion Sort: "<<cost_insertion_sort<<" cmp: "<< operation_counter.get_cmp()<<" move: "<<operation_counter.get_move()<<" call: "<< operation_counter.get_calls()<<std::endl; 
+
 }

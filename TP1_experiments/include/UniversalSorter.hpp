@@ -47,7 +47,7 @@ class UniversalSorter{
     void print_statics_insertion(BreaksStatistics breaks_statistics);
     int find_num_breaks_with_min_cost_difference(BreaksStatistics *statistics_quick_sort, BreaksStatistics *statistics_insertion_sort, int num_breaks);
     void print_break_thershold_result(int partition_size, double difference_max_min_size, int num_size_breaks);
-    void determine_break_threshold(int partition_thershold, item* vet, int vet_size, double cost_threshold, int seed);
+    int determine_break_threshold(int partition_thershold, item* vet, int vet_size, double cost_threshold, int seed);
     OperationsCounter* get_operation_counter();
     Sorter get_sorter();
 };

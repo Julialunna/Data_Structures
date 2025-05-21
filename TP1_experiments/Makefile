@@ -1,17 +1,20 @@
 # Parâmetros de compilação
 KEYSIZE      ?= 5
 REGISTERSIZE ?= 20
-VETSIZE      ?= 200
+VETSIZE      ?= 1000
+DISORDERLEVEL ?= 60
 
 # Nome do sufixo para os binários e objetos
-SUFFIX = k$(KEYSIZE).r$(REGISTERSIZE).v$(VETSIZE)
+SUFFIX = k$(KEYSIZE).r$(REGISTERSIZE).v$(VETSIZE).dl$(DISORDERLEVEL)
 
 # Ferramentas e diretórios
 CC = g++
 CFLAGS = -g -std=c++11 -Wall \
          -DKEYSIZE=$(KEYSIZE) \
          -DREGISTERSIZE=$(REGISTERSIZE) \
-         -DVETSIZE=$(VETSIZE)
+         -DVETSIZE=$(VETSIZE)\
+		 -DVETDISORDER=$(DISORDERLEVEL)
+
 SRC_DIR     = src
 BUILD_DIR   = obj/$(SUFFIX)
 INCLUDE_DIR = include

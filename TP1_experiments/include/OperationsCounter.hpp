@@ -13,6 +13,11 @@
 #ifndef VETSIZE
 #define VETSIZE 1
 #endif
+
+#ifndef VETDISORDER
+#define VETDISORDER 1
+#endif
+
 typedef struct item{
     char key[KEYSIZE];
     char payload [REGISTERSIZE];

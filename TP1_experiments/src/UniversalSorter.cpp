@@ -205,7 +205,7 @@ void UniversalSorter::shuffleVector(item *vet, int vet_size, int num_breaks, int
 
   for (int i = 0; i < num_breaks; i++)
   {
-    while (index1 == index2)
+    while (index1 == index2 )
     {
       index1 = (int)(drand48() * vet_size);
       index2 = (int)(drand48() * vet_size);
@@ -263,7 +263,7 @@ void UniversalSorter::print_break_thershold_result(int partition_size, double di
 }
 
 //determine the number of breaks at the for which is better to use insertion sort than quicksort
-void UniversalSorter::determine_break_threshold(int partition_threshold, item *vet, int vet_size, double cost_threshold, int seed)
+int UniversalSorter::determine_break_threshold(int partition_threshold, item *vet, int vet_size, double cost_threshold, int seed)
 {
   int min_num_breaks_range = 1, max_num_breaks_range = vet_size / 2,
   step = (int)(max_num_breaks_range - min_num_breaks_range) / 5, 
@@ -320,6 +320,7 @@ void UniversalSorter::determine_break_threshold(int partition_threshold, item *v
     delete[] statistics_quick_sort;
     iter++;
   }
+  return statistics_quick_sort[min_cost_index].num_breaks;
 }
 OperationsCounter* UniversalSorter::get_operation_counter(){
   return &this->operation_counter;
