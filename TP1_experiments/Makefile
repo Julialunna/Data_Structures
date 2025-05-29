@@ -1,15 +1,16 @@
 # Parâmetros de compilação
-KEYSIZE      ?= 5
+KEYSIZE      ?= 14
 REGISTERSIZE ?= 20
 VETSIZE      ?= 1000
-DISORDERLEVEL ?= 60
+DISORDERLEVEL ?= 0
 
 # Nome do sufixo para os binários e objetos
+
 SUFFIX = k$(KEYSIZE).r$(REGISTERSIZE).v$(VETSIZE).dl$(DISORDERLEVEL)
 
 # Ferramentas e diretórios
 CC = g++
-CFLAGS = -g -std=c++11 -Wall \
+CFLAGS = -g -std=c++11 -Wall -I/usr/include/eigen3 \
          -DKEYSIZE=$(KEYSIZE) \
          -DREGISTERSIZE=$(REGISTERSIZE) \
          -DVETSIZE=$(VETSIZE)\

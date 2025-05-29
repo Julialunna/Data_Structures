@@ -118,3 +118,72 @@ void Sorter::quickSort3Ins(item *A, int l, int r, int partition_threshold, Opera
   }
 
 }
+
+void Sorter::partition(item *A, int l, int r, int *i, int *j, OperationsCounter *operation_counter)
+{
+  operation_counter->inccalls(1);
+
+  item pivot;
+  *i = l;
+  *j = r;
+  pivot = A[(*i + *j) / 2];
+  do
+  {
+    while (pivot > A[*i])
+    {
+      operation_counter->inccmp(1);
+      (*i)++;
+    }
+    operation_counter->inccmp(1);
+    while (pivot < A[*j])
+    {
+      operation_counter->inccmp(1);
+      (*j)--;
+    }
+    operation_counter->inccmp(1);
+    
+    if (*i <= *j)
+    {
+      swap(&A[*i], &A[*j], operation_counter);
+      (*i)++;
+      (*j)--;
+    }
+  } while (*i <= *j);
+}
+
+
+// quicksort with median of 3
+void Sorter::quickSort3(item *A, int l, int r, OperationsCounter *operation_counter)
+{
+  int i, j;
+  operation_counter->inccalls(1);
+
+  this->partition3(A, l, r, &i, &j, operation_counter);
+ 
+  if (l < j)
+  {
+    quickSort3(A, l, j,operation_counter);
+  }
+  if (i < r)
+  {
+    quickSort3(A, i, r, operation_counter);
+  }
+}
+
+
+void Sorter::quickSort(item *A, int l, int r, OperationsCounter *operation_counter)
+{
+  int i, j;
+
+  operation_counter->inccalls(1);
+
+  partition(A, l, r, &i, &j, operation_counter);
+  if (l < j)
+  {
+    quickSort(A, l, j, operation_counter);
+  }
+  if (i < r)
+  {
+    quickSort(A, i, r, operation_counter);
+  }
+}

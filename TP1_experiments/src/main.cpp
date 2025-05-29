@@ -10,11 +10,31 @@
 #include "Sorter.hpp"
 #include"OperationsCounter.hpp"
 
+
+#include <Eigen/Dense>
+
+// Regressão linear via decomposição QR
+// Regressão linear via decomposição QR
+void fitLinearRegression(const double* X, const double* Y, int n, int p, Eigen::VectorXd& coefficients) {
+    Eigen::MatrixXd Xmat(n, p + 1);
+    Eigen::VectorXd Yvec(n);
+
+    for (int i = 0; i < n; ++i) {
+        Xmat(i, 0) = 1.0;
+        for (int j = 0; j < p; ++j) {
+            Xmat(i, j + 1) = X[i * p + j];
+        }
+        Yvec(i) = Y[i];
+    }
+
+    // Resolve min ||Xmat * coef - Yvec|| via QR decomposition
+    coefficients = Xmat.colPivHouseholderQr().solve(Yvec);
+}
 struct DataPoint
 {
-    int cmp;
-    int move;
-    int calls;
+    double cmp;
+    double move;
+    double calls;
     double cost;
 };
 
@@ -88,16 +108,19 @@ template <typename Func>
 double medir_tempo_ms(Func func)
 {
     auto start = std::chrono::high_resolution_clock::now();
-    func(); // executa a função passada
+    func();  
     auto end = std::chrono::high_resolution_clock::now();
-    std::chrono::duration<double, std::milli> duration = end - start;
-    return duration.count();
+
+    std::chrono::duration<double, std::micro> duration = end - start;
+    return duration.count(); 
 }
 
 void create_disorder(UniversalSorter universal_sorter, item *vet, int break_threshold, int partition_threshold){
     if(VETDISORDER == 100){
         for(int i =0;i<VETSIZE/2;i++){
-            vet[0] = vet[VETSIZE - i - 1];
+            item temp = vet[i];
+            vet[i] = vet[VETSIZE - 1 - i];
+            vet[VETSIZE - 1 - i] = temp;
         }
     }else if(VETDISORDER == 40){
         universal_sorter.shuffleVector(vet, VETSIZE, 0.4 * VETSIZE, 1);
@@ -112,56 +135,114 @@ float calculate_cost(OperationsCounter operation_counter, double comparison_coef
     return (operation_counter.get_cmp() * comparison_coefficient + operation_counter.get_move() * movement_coefficient + operation_counter.get_calls() * call_coefficient);
 }
 
-int main()
+ main()
 {
     int i, j, p;
-    long mult = (long)pow(10, KEYSIZE - 1);
+    long mult = (long) pow(10, KEYSIZE - 1);
     srand48(1);
     item vet[VETSIZE], vet_copy[VETSIZE];
     OperationsCounter operation_counter;
     Sorter sorting_algorithms;
+    float costs[7];
     
-    DataPoint *data = new DataPoint[NUM_DATA];
-
+    DataPoint *data = new DataPoint[7];
+    
+    srand48(1);
     //creating vector 
     for (i = 0; i < VETSIZE; i++)
     {
-        for (j = (int)(drand48() * mult), p = KEYSIZE - 2; p >= 0; j /= 10, p--)
-        {
-            vet[i].key[p] = '0' + j % 10;
-        }
-        vet[i].key[KEYSIZE - 1] = 0;
+        for (int p = 0; p < KEYSIZE - 1; ++p)
+            vet[i].key[p] = '0' + (rand() % 10);
+        vet[i].key[KEYSIZE - 1] = '\0';
         for (j = 0; j < REGISTERSIZE - 1; j++)
         {
             vet[i].payload[j] = '0' + j % 10;
         }
         vet[i].payload[REGISTERSIZE - 1] = 0;
     }
-
-    double comparison_coefficient = 0, movement_coefficient = 0, call_coefficient = 0;
-    double cost0 = 0, cost1 = 0, cost2 = 0;
-
+    
+    
     //calculating comparison, movements and calls cost
     copy_vet(vet, vet_copy);
-    cost0 = medir_tempo_ms([&](){ sorting_algorithms.quickSort3Ins(vet_copy, 0, VETSIZE - 1, 5, &operation_counter);});
+    operation_counter.resetcounter();
+    
+    copy_vet(vet, vet_copy);
+    costs[0] = medir_tempo_ms([&](){ sorting_algorithms.quickSort(vet_copy, 0, VETSIZE - 1, &operation_counter);});
+    data[0] = {operation_counter.get_cmp(), operation_counter.get_move(), operation_counter.get_calls(), costs[0]};
+    std::cout<<operation_counter.get_cmp()<<", "<< operation_counter.get_move()<<", "<< operation_counter.get_calls()<<", "<< costs[0]<<" "<<std::endl;
+    operation_counter.resetcounter();
+    
+    copy_vet(vet, vet_copy);
+    costs[1] = medir_tempo_ms([&](){ sorting_algorithms.quickSort(vet_copy, 0, VETSIZE- 1, &operation_counter);});
+    std::cout<<operation_counter.get_cmp()<<", "<< operation_counter.get_move()<<", "<< operation_counter.get_calls()<<", "<< costs[1]<<" "<<std::endl;
+    data[1] = {operation_counter.get_cmp(), operation_counter.get_move(), operation_counter.get_calls(), costs[1]};
+    operation_counter.resetcounter();
+    
+    copy_vet(vet, vet_copy);
+    costs[2] = medir_tempo_ms([&](){ sorting_algorithms.insertionSort(vet_copy, 0, VETSIZE - 1, &operation_counter);});
+    std::cout<<operation_counter.get_cmp()<<", "<< operation_counter.get_move()<<", "<< operation_counter.get_calls()<<", "<< costs[2]<<" "<<std::endl;
+    data[2] = {operation_counter.get_cmp(), operation_counter.get_move(), operation_counter.get_calls(), costs[2]};
+    operation_counter.resetcounter();
 
-    data[0] = {operation_counter.get_cmp(), operation_counter.get_move(), operation_counter.get_calls(), cost0};
+    
+    copy_vet(vet, vet_copy);
+    costs[3] = medir_tempo_ms([&](){ sorting_algorithms.insertionSort(vet_copy, 0, VETSIZE-1, &operation_counter);});
+    std::cout<<operation_counter.get_cmp()<<", "<< operation_counter.get_move()<<", "<< operation_counter.get_calls()<<", "<< costs[3]<<" "<<std::endl;
+    data[3] = {operation_counter.get_cmp(), operation_counter.get_move(), operation_counter.get_calls(), costs[3]};
     operation_counter.resetcounter();
     
     copy_vet(vet, vet_copy);
-    cost1 = medir_tempo_ms([&](){ sorting_algorithms.quickSort3Ins(vet_copy, 0, (VETSIZE/2) - 1, 5, &operation_counter);});
-    data[1] = {operation_counter.get_cmp(), operation_counter.get_move(), operation_counter.get_calls(), cost1};
+    costs[4] = medir_tempo_ms([&](){ sorting_algorithms.quickSort(vet_copy, 0, VETSIZE - 1, &operation_counter);});
+    std::cout<<operation_counter.get_cmp()<<", "<< operation_counter.get_move()<<", "<< operation_counter.get_calls()<<", "<< costs[4]<<" "<<std::endl;
+    data[4] = {operation_counter.get_cmp(), operation_counter.get_move(), operation_counter.get_calls(), costs[4]};
     operation_counter.resetcounter();
     
     copy_vet(vet, vet_copy);
-    cost2 = medir_tempo_ms([&](){ sorting_algorithms.quickSort3Ins(vet_copy, 0, (VETSIZE/3) - 1, 5, &operation_counter); });
-    data[2] = {operation_counter.get_cmp(), operation_counter.get_move(), operation_counter.get_calls(), cost2};
-    std::cout<<operation_counter.get_cmp()<<" "<< operation_counter.get_move()<<" "<< operation_counter.get_calls()<<" "<< cost2<<" "<<std::endl;
+    costs[5] = medir_tempo_ms([&](){ sorting_algorithms.quickSort(vet_copy, 0, VETSIZE - 1, &operation_counter);});
+    std::cout<<operation_counter.get_cmp()<<", "<< operation_counter.get_move()<<", "<< operation_counter.get_calls()<<", "<< costs[5]<<" "<<std::endl;
+    data[5] = {operation_counter.get_cmp(), operation_counter.get_move(), operation_counter.get_calls(), costs[5]};
     operation_counter.resetcounter();
+
+    copy_vet(vet, vet_copy);
+    costs[6] = medir_tempo_ms([&](){ sorting_algorithms.insertionSort(vet_copy, 0, VETSIZE  - 1, &operation_counter);});
+    std::cout<<operation_counter.get_cmp()<<", "<< operation_counter.get_move()<<", "<< operation_counter.get_calls()<<", "<< costs[6]<<" "<<std::endl;
+    data[6] = {operation_counter.get_cmp(), operation_counter.get_move(), operation_counter.get_calls(), costs[6]};
+    operation_counter.resetcounter();
+
+    for( int i =0;i<7;i++){
+        std::cout<<i<<" "<<data[i].cmp<<" "<<data[i].move<<" "<<data[i].calls<<" "<<data[i].cost<<std::endl;
+    }
+
+    int amostras = 7;
+    double X[amostras * 3] = {
+        data[0].cmp,  data[0].move,   data[0].calls,    
+        data[1].cmp,  data[1].move,   data[1].calls,    
+        data[2].cmp,  data[2].move,   data[2].calls,
+        data[3].cmp,  data[3].move,   data[3].calls,
+        data[4].cmp,  data[4].move,   data[4].calls,
+        data[5].cmp,  data[5].move,   data[5].calls, 
+        data[6].cmp,  data[6].move,   data[6].calls
+    };
+
+    double Y[amostras] = {data[0].cost, data[1].cost, data[2].cost, data[3].cost, data[4].cost, data[5].cost, data[6].cost};
     
-    linear_regression_qr(data, NUM_DATA, &comparison_coefficient, &movement_coefficient, &call_coefficient);
+    std::cout << "amostras = " << amostras
+    << ", variaveis = " << 3 << std::endl;
     
-    UniversalSorter universal_sorter(comparison_coefficient, movement_coefficient, call_coefficient);
+    Eigen::VectorXd coefs;
+    fitLinearRegression(X, Y, amostras, 3, coefs);
+    
+    std::cout << "Coeficientes calibrados:\n";
+    std::cout << "intercepto: " << coefs[0] << std::endl;
+    std::cout << "a (comparações): " << coefs[1] << " seg/op\n";
+    std::cout << "b (movimentações): " << coefs[2] << " seg/op\n";
+    std::cout << "c (chamadas): " << coefs[3]<<" seg/op\n";
+    
+    double comparison_coefficient =  coefs[1], movement_coefficient = coefs[2], call_coefficient =  coefs[3];
+    
+    //linear_regression_qr(data, 5, &comparison_coefficient, &movement_coefficient, &call_coefficient);
+    
+    UniversalSorter universal_sorter(coefs[1], coefs[2], coefs[3]);
     
     double cost_threshold = 10.000000;
     int partition_threshold = universal_sorter.determine_partition_threshold(vet, VETSIZE, cost_threshold);
@@ -170,23 +251,27 @@ int main()
     universal_sorter.universal_sorter(vet, VETSIZE, partition_threshold, break_threshold);
 
     create_disorder(universal_sorter, vet, break_threshold, partition_threshold);
-    
     std::cout<<"cmp: "<<comparison_coefficient<<" move: "<<movement_coefficient<<" call: "<< call_coefficient<<std::endl;
     std::cout<<"KEYSIZE: "<<KEYSIZE<<" REGISTERSIZE: "<<REGISTERSIZE<<" VETSIZE: "<<VETSIZE<<" VETDISORDER: "<<VETDISORDER<<std::endl;
+    operation_counter.resetcounter();
+    
+    std::cout<<"partition: "<<partition_threshold<<" break: "<<break_threshold<<std::endl;
     copy_vet(vet, vet_copy);
     universal_sorter.get_operation_counter()->resetcounter();
     universal_sorter.universal_sorter(vet_copy, VETSIZE, partition_threshold, break_threshold);
-    float cost_universal_sorter = universal_sorter.calculate_cost();
+    float cost_universal_sorter = calculate_cost(*universal_sorter.get_operation_counter(), comparison_coefficient, movement_coefficient, call_coefficient);
     std::cout<<"Universal Sorter: "<<cost_universal_sorter<<" cmp: "<< universal_sorter.get_operation_counter()->get_cmp()<<" move: "<<universal_sorter.get_operation_counter()->get_move()<<" call: "<< universal_sorter.get_operation_counter()->get_calls()<<std::endl;
 
+    operation_counter.resetcounter();
     copy_vet(vet, vet_copy);
-    sorting_algorithms.quickSort3Ins(vet_copy, 0 , VETSIZE-1, partition_threshold, &operation_counter);
+    sorting_algorithms.quickSort(vet_copy, 0 , VETSIZE-1, &operation_counter);
     float cost_quick_sort = calculate_cost(operation_counter, comparison_coefficient, movement_coefficient, call_coefficient); 
     std::cout<<"Quick Sort: "<<cost_quick_sort<<" cmp: "<< operation_counter.get_cmp()<<" move: "<<operation_counter.get_move()<<" call: "<< operation_counter.get_calls()<<std::endl;
-
+    
     operation_counter.resetcounter();
+    copy_vet(vet, vet_copy);
     sorting_algorithms.insertionSort(vet_copy, 0, VETSIZE-1, &operation_counter);
     float cost_insertion_sort = calculate_cost(operation_counter, comparison_coefficient, movement_coefficient, call_coefficient);
-     std::cout<<"Insertion Sort: "<<cost_insertion_sort<<" cmp: "<< operation_counter.get_cmp()<<" move: "<<operation_counter.get_move()<<" call: "<< operation_counter.get_calls()<<std::endl; 
+    std::cout<<"Insertion Sort: "<<cost_insertion_sort<<" cmp: "<< operation_counter.get_cmp()<<" move: "<<operation_counter.get_move()<<" call: "<< operation_counter.get_calls()<<std::endl; 
 
 }

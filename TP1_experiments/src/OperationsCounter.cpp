@@ -1,6 +1,26 @@
 #include <iostream>
 #include "OperationsCounter.hpp"
 
+
+bool operator<(const item& a, const item&b) {
+        return std::strcmp(a.key, b.key) < 0;
+    }
+
+    bool operator>(const item& a, const item&b) {
+        return std::strcmp(a.key, b.key) > 0;
+    }
+
+    bool operator==(const item& a, const item&b) {
+        return std::strcmp(a.key, b.key) == 0;
+    }
+    bool operator<=(const item& a, const item&b) {
+    return std::strcmp(a.key, b.key) <= 0;
+    }
+
+    bool operator>=(const item& a, const item&b) {
+        return std::strcmp(a.key, b.key) >= 0;
+    }
+
 void OperationsCounter::resetcounter()
 {
     this->cmp = 0;
@@ -19,6 +39,7 @@ void OperationsCounter::incmove(int num)
 
     this->move += num;
 }
+
 
 void OperationsCounter::inccalls(int num)
 {

@@ -22,26 +22,14 @@ typedef struct item{
     char key[KEYSIZE];
     char payload [REGISTERSIZE];
 
-    bool operator < (const item& other) const {
-        return std::strcmp(this->key, other.key) < 0;
-    }
-
-    bool operator>(const item& other) const {
-        return std::strcmp(this->key, other.key) > 0;
-    }
-
-    bool operator==(const item& other) const {
-        return std::strcmp(this->key, other.key) == 0;
-    }
-    bool operator<=(const item& other) const {
-    return std::strcmp(this->key, other.key) <= 0;
-    }
-
-    bool operator>=(const item& other) const {
-        return std::strcmp(this->key, other.key) >= 0;
-    }
-
 }item_t;
+
+bool operator<(const item& a, const item& b);
+bool operator>(const item& a, const item& b);
+bool operator==(const item& a, const item& b);
+bool operator<=(const item& a, const item& b);
+bool operator>=(const item& a, const item& b);
+
 
 class OperationsCounter
 {
