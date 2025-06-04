@@ -22,3 +22,5 @@ ${BUILD_DIR}/main.o: ${INCLUDE_DIR}/Set.hpp ${SRC_DIR}/main.cpp
 
 ${BIN_DIR}/pa5.out: ${BUILD_DIR}/main.o ${BUILD_DIR}/Set.o  
 	$(CC) $(CFLAGS) ${BUILD_DIR}/main.o ${BUILD_DIR}/Set.o -o ${BIN_DIR}/pa5.out
+clean:
+	rm -rf ${BUILD_DIR}/*.o ${BIN_DIR}/pa5.out

@@ -43,6 +43,7 @@ int main(int argc, char** argv){
                 else
                     cout << "O elemento " << t << "nao pertence ao conjunto!\n";
                 break;
+
             case 'u':{
                 cout << "A uniao dos conjuntos e: ";
                 StringSet* l = LeConjunto();

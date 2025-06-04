@@ -19,13 +19,12 @@ StringSet::~StringSet()
 }
 int StringSet::Hash(string s)
 {
-    unsigned int hash = 0;
+    long long hash = 0;
     for (char c : s)
     {
-        hash = ((31 * hash) + c);
+        hash = ((31 * hash) + c) % this->tamanhoTabela;
     }
-    int pos = hash % this->tamanhoTabela;
-    return pos;
+    return (int)hash;
 }
 int StringSet::Rehash(int pos)
 {
@@ -54,7 +53,7 @@ void StringSet::Resize(size_t tamanho)
 {
     ElementoTabela *nova_tabela = new ElementoTabela[tamanho];
 
-    for (int i = 0; i < tamanho; i++)
+    for (long unsigned int  i = 0; i < tamanho; i++)
     {
         nova_tabela[i].retirada = false;
         nova_tabela[i].vazio = true;
@@ -83,9 +82,7 @@ void StringSet::Remover(string s)
         while(this->tabela[posicao].dado != s){
             posicao = this->Rehash(posicao);
         }
-        this->tabela[posicao].retirada = true;
-        this->tabela[posicao].vazio = true;
-        
+        this->tabela[posicao].retirada = true; 
     }
 }
 bool StringSet::Pertence(string s)
@@ -101,7 +98,7 @@ bool StringSet::Pertence(string s)
                 return false;
             }
         }
-        else if (this->tabela[posicao].dado == s)
+        else if (!this->tabela[posicao].retirada && this->tabela[posicao].dado == s)
         {
             return true;
         }
@@ -112,21 +109,102 @@ bool StringSet::Pertence(string s)
 }
 void StringSet::Imprimir()
 {
+    int count = 0;
     for (int i = 0; i < this->tamanhoTabela; i++)
     {
-        if (!this->tabela[i].vazio)
+        if (!this->tabela[i].vazio && !this->tabela[i].retirada)
         {
-            std::cout << this->tabela[i].dado << std::endl;
+            count++;
         }
     }
+
+    string* elementos = new string[count];
+    int idx = 0;
+
+    for (int i = 0; i < this->tamanhoTabela; i++)
+    {
+        if (!this->tabela[i].vazio && !this->tabela[i].retirada)
+        {
+            elementos[idx++] = this->tabela[i].dado;
+        }
+    }
+
+    for (int i = 1; i < count; i++)
+    {
+        string chave = elementos[i];
+        int j = i - 1;
+        while (j >= 0 && elementos[j] > chave)
+        {
+            elementos[j + 1] = elementos[j];
+            j--;
+        }
+        elementos[j + 1] = chave;
+    }
+
+    if (count == 0)
+    {
+        cout << "{  }" << endl;
+    }
+    else
+    {
+        cout << "{ ";
+        for (int i = 0; i < count; i++)
+        {
+            cout << elementos[i];
+            if (i + 1 < count)
+                cout << ", ";
+        }
+        cout << " }" << endl;
+    }
+
+    delete[] elementos;
 }
+
 
 StringSet *StringSet::Intersecao(StringSet *S)
 {
+    StringSet* resultado = new StringSet(1);
+    for (int i = 0; i < this->tamanhoTabela; i++){
+        if (!this->tabela[i].vazio && !this->tabela[i].retirada){
+            string dado = this->tabela[i].dado;
+            if(S->Pertence(dado)){
+                resultado->Inserir(dado);
+            }
+        }
+    }
+    return resultado;
+
 }
 StringSet *StringSet::Uniao(StringSet *S)
 {
+    //tamanho máximo
+    StringSet* resultado = new StringSet(S->tamanhoTabela + this->tamanhoTabela);
+    for (int i = 0; i < this->tamanhoTabela; i++) {
+        if (!this->tabela[i].vazio && !this->tabela[i].retirada) {
+            resultado->Inserir(this->tabela[i].dado);
+        }
+    }
+    for (int i = 0; i < S->tamanhoTabela; i++) {
+        if (!S->tabela[i].vazio && !S->tabela[i].retirada) {
+            resultado->Inserir(S->tabela[i].dado);
+        }
+    }
+    return resultado;
 }
 StringSet *StringSet::DiferencaSimetrica(StringSet *S)
 {
+     //tamanho máximo
+    StringSet* resultado = new StringSet(S->tamanhoTabela + this->tamanhoTabela);
+    for (int i = 0; i < this->tamanhoTabela; i++) {
+        if (!this->tabela[i].vazio && !this->tabela[i].retirada && !S->Pertence(this->tabela[i].dado)) {
+            resultado->Inserir(this->tabela[i].dado);
+        }
+    }
+
+    for (int i = 0; i < S->tamanhoTabela; i++) {
+        if (!S->tabela[i].vazio && !S->tabela[i].retirada && !this->Pertence(S->tabela[i].dado)) {
+            resultado->Inserir( S->tabela[i].dado);
+        }
+    }
+    return resultado;
 }
