@@ -3,9 +3,9 @@
 #include "Stack.hpp"
 #include "Queue.hpp"
 int main(){
-    List lista;
-    Stack pilha;
-    Queue fila;
+    List<int> lista;
+    Stack<int> pilha;
+    Queue<int> fila;
     char comando = ' ';
     int item, posicao;
 
@@ -17,6 +17,8 @@ int main(){
             // lista.print();
             fila.queue(item);
             fila.print();
+            // pilha.pile(item);
+            // pilha.print();
         }else if(comando == 'b'){
             // std::cin>>item;
             // std::cin>>posicao;
@@ -24,12 +26,15 @@ int main(){
             // lista.print();
             fila.dequeue();
             fila.print();
+            // pilha.unstack();
+            // pilha.print();
         }else if(comando =='c'){
             
             std::cin>>item;
             std::cout<<fila.search(item)<<std::endl;
             // lista.insertEnd(item);
             // lista.print();
+            // std::cout<<pilha.search(item)<<std::endl;
         }else if(comando == 'd'){
              lista.removeBeginning();
              lista.print();

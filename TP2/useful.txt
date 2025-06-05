@@ -1,0 +1,17 @@
+para usar lista de template 
+struct Pacote {
+    int   id;       // chave única do pacote
+    std::string payload; // pode ser qualquer informação extra
+
+    // Precisamos de um operador== que compare apenas 'id', 
+    // pois é assim que o List<T>::search vai funcionar.
+    bool operator==(const Pacote& outro) const {
+        return this->id == outro.id;
+    }
+
+    // Para facilitar o print, sobrecarregamos operator<<
+    friend std::ostream& operator<<(std::ostream& os, const Pacote& p) {
+        os << "[id=" << p.id << ", payload=" << p.payload << "]";
+        return os;
+    }
+};

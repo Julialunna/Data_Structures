@@ -64,3 +64,16 @@ void Stack::print(){
     std::cout << std::endl;
     
 }
+
+itemType Stack::search(keyType key){
+    StackNode  *p;
+    p = this->top;
+    while(p!=nullptr){
+        if(p->item == key){
+            return p->item;
+        }
+        p = p->next;
+    }
+
+    return -1;
+}
