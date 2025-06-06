@@ -34,6 +34,7 @@ public:
     T removeAtPosition(int position);
 
     T search(const T& key);
+    int getSize() const;
 
     void print();
     void clean();
@@ -42,8 +43,6 @@ private:
     int size;
     ListNode<T>* first;
     ListNode<T>* last;
-
-   
     ListNode<T>* position(int position);
 };
 
@@ -83,6 +82,11 @@ List<T>::~List() {
     delete this->first;
 }
 
+//O(1)
+template <typename T>
+int List<T>::getSize() const {
+    return this->size;
+}
 
 // position one ListNode before the position. O(n) worst case
 template <typename T>
