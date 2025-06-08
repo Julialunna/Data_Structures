@@ -4,7 +4,6 @@
 //     Warehouse new_warehouse(i, num);
 //     warehouses.insertBeginning(new_warehouse);
 // }
-//List<Package> packages;
 #include <iostream>
 #include <fstream>
 #include "List.hpp"
@@ -21,16 +20,16 @@ int main(int argc, char*argv[]){
         std::cerr << "Erro: file name needed" << std::endl;
         return 1;
     }
-
-   file_name = argv[1];
-
+    
+    file_name = argv[1];
+    
     std::ifstream file(file_name);
     
     if (!file) {
         std::cerr << "Error opening file.\n";
         return 1;
     }
-
+    
     int num_vertex = 0, num_packages = 0, destination = 0, origin =0;
     file >> num_vertex;
     file >> num_packages;
@@ -38,6 +37,7 @@ int main(int argc, char*argv[]){
     file >> destination;
     Graph<int> graph_warehouse(num_vertex);
     List<Warehouse> warehouses;
+    List<Package> packages;
     
     int neighbor_index = 0, num_neighbors;
     //reading graph
@@ -51,11 +51,20 @@ int main(int argc, char*argv[]){
                 std::cerr << e << "\n";
             }
         }
+        std::cout<<"i: "<<i<<std::endl;
         graph_warehouse.PrintNeighbors(i);
         
     }
-    List<int> path = graph_warehouse.BreadthFirstSearch(origin, destination);
-    path.print();
+
+    Package package(1, origin, destination);
+    packages.insertBeginning(package);
+    Package using_package = packages.search(1);
+    graph_warehouse.BreadthFirstSearch(origin, destination).print();
+    using_package.calculate_route(graph_warehouse);
+    using_package.get_route()->print();
+    Package using_package2 = packages.search(1);
+    using_package2.get_route()->print();
+    std::cout<<"a|"<<std::endl;
 
     return 0;
 }

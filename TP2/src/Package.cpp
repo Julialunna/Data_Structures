@@ -1,4 +1,12 @@
 #include "Package.hpp"
+Package::Package()
+    : id(-1)
+    , state(1)
+    , storage_time(0)
+    , transport_time(0)
+    , warehouse_origin_id(-1)
+    , warehouse_destination_id(-1)
+  {}
 
 Package::Package(int id, int warehouse_origin_id, int warehouse_destination_id){
     this->id = id;
@@ -9,6 +17,7 @@ Package::Package(int id, int warehouse_origin_id, int warehouse_destination_id){
     this->warehouse_origin_id = warehouse_origin_id;
     this->warehouse_destination_id = warehouse_destination_id;
 }
+
 int Package::get_id(){
     return this->id;
 }
@@ -29,4 +38,15 @@ int Package::get_warehouse_origin_id(){
 }
 int Package::get_warehouse_destination_id(){
     return this->warehouse_destination_id;
+}
+
+void Package::calculate_route(Graph<int>& warehouses){
+   this->route = warehouses.BreadthFirstSearch(
+        this->warehouse_origin_id,
+        this->warehouse_destination_id
+    );
+}
+
+List<int>* Package::get_route(){
+    return &this->route;
 }

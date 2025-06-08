@@ -1,7 +1,8 @@
 #ifndef WAREHOUSE_HPP
 #define WAREHOUSE_HPP
 #include "Stack.hpp"
-#include "Package.hpp"
+#include "Package.hpp" 
+
 class Warehouse{
     private:
     int id;

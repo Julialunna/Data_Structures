@@ -1,6 +1,7 @@
 #ifndef PACKAGE_HPP
 #define PACKAGE_HPP
-
+#include "List.hpp"
+#include "Graph.hpp"
 /*
 POSSIBLE STATES AND THEIR MEANINGS
 state 1: Not posted
@@ -19,7 +20,9 @@ class Package{
     int transport_time;
     int warehouse_origin_id;
     int warehouse_destination_id;
+    List<int> route;
     public:
+    Package();
     Package(int id, int warehouse_origin_id, int warehouse_destination_id);
     int get_id();
     int get_state();
@@ -31,6 +34,8 @@ class Package{
     }
     int get_warehouse_origin_id();
     int get_warehouse_destination_id();
+    void calculate_route(Graph<int>& warehouses);
+    List<int>* get_route();
     
 };
 #endif
