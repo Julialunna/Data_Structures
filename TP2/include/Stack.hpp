@@ -51,13 +51,13 @@ Stack<T>::Stack() {
     this->size = 0;
 }
 
-//O(n)
+//O(n), delete all nodes
 template <typename T>
 Stack<T>::~Stack() {
     this->clean();
 }
 
-//O(1)
+//O(1), put item on top of pile 
 template <typename T>
 void Stack<T>::pile(T item) {
     StackNode<T>* new_node = new StackNode<T>();
@@ -66,7 +66,7 @@ void Stack<T>::pile(T item) {
     this->top = new_node;
     this->size++;
 }
-//O(1)
+//O(1), gets node on top of pile and delete it 
 template <typename T>
 T Stack<T>::unstack() {
     if (this->size == 0) {
@@ -76,10 +76,11 @@ T Stack<T>::unstack() {
     T aux = p->item;
     this->top = p->next;
     delete p;
+    //reducing size 
     this->size--;
     return aux;
 }
-//O(n)
+//O(n), deleting all nodes 
 template <typename T>
 void Stack<T>::clean() {
     while (this->size > 0) {
@@ -90,6 +91,7 @@ void Stack<T>::clean() {
 template <typename T>
 void Stack<T>::print() {
     StackNode<T>* p = this->top;
+    //iterates over all stack and pritn items 
     while (p != nullptr) {
         std::cout << p->item << " ";
         p = p->next;
@@ -101,6 +103,7 @@ template <typename T>
 T Stack<T>::search(const T& key) {
 
     StackNode<T>* p = this->top;
+    //iterating over pile looking for node with the key wanted
     while (p != nullptr) {
         if (p->item == key) {
             return p->item;

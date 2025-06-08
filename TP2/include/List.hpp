@@ -33,11 +33,12 @@ public:
     T removeEnd();
     T removeAtPosition(int position);
 
-    T search(const T& key);
+    T search(const int key);
     int getSize() const;
 
     void print();
     void clean();
+    int getSize();
 
 private:
     int size;
@@ -56,13 +57,13 @@ ListNode<T>::ListNode() {
 //O(1)
 template <typename T>
 List<T>::List() {
-    // Criamos o sentinela em 'first'
+    // cerate sentinel in'first', list items start at first->next
     this->first = new ListNode<T>();
     this->last  = this->first;
     this->size  = 0;
 }
 
-//O(n)
+//O(n), deletes all nodes
 template <typename T>
 void List<T>::clean() {
     ListNode<T>* p = this->first->next;
@@ -75,7 +76,7 @@ void List<T>::clean() {
     this->size = 0;
 }
 
-//O(n)
+//O(n), delete all nodes than the sentinel (firts)
 template <typename T>
 List<T>::~List() {
     this->clean();
@@ -95,7 +96,7 @@ ListNode<T>* List<T>::position(int position) {
         throw "Error: invalid position";
     }
     ListNode<T>* p = this->first;
-    // avançar exatamente (position - 1) passos a partir de 'first'
+    // advance exactly (position - 1) steps from 'first'
     for (int i = 1; i < position; i++) {
         p = p->next;
     }
@@ -107,7 +108,7 @@ ListNode<T>* List<T>::position(int position) {
 template <typename T>
 T List<T>::getItem(int position) {
     ListNode<T>* p = this->position(position);
-    // p aponta para o nó ANTES de onde está o item
+    //p points to the node before where the item is
     return p->next->item;
 }
 
@@ -117,7 +118,7 @@ void List<T>::setItem(T item, int position) {
     ListNode<T>* p = this->position(position);
     p->next->item = item;
 }
-//O(1)
+//O(1), inserts ate first->next
 template <typename T>
 void List<T>::insertBeginning(T item) {
     ListNode<T>* new_node = new ListNode<T>();
@@ -131,7 +132,7 @@ void List<T>::insertBeginning(T item) {
     }
 }
 
-//O(1)
+//O(1), inserts at last node
 template <typename T>
 void List<T>::insertEnd(T item) {
     ListNode<T>* new_node = new ListNode<T>();
@@ -141,9 +142,10 @@ void List<T>::insertEnd(T item) {
     this->size++;
 }
 
-// worst case O(n)
+// worst case O(n), insert in desired position
 template <typename T>
 void List<T>::insertAtPosition(T item, int position) {
+    //gets node before the desired one
     ListNode<T>* p = this->position(position);
     ListNode<T>* new_node = new ListNode<T>();
     new_node->item = item;
@@ -166,7 +168,7 @@ T List<T>::removeBeginning() {
     this->first->next = p->next;
     this->size--;
     if (this->first->next == nullptr) {
-        // Ficou vazia outra vez
+        // its empty again
         this->last = this->first;
     }
     T aux = p->item;
@@ -180,7 +182,7 @@ T List<T>::removeEnd() {
     if (this->size == 0) {
         throw "Error: empty list";
     }
-    // position(this->size) retorna o nó ANTES do último item
+    //position(this->size) returns the node before the last item
     ListNode<T>* p = this->position(this->size);
     p->next = nullptr;
     this->size--;
@@ -209,11 +211,12 @@ T List<T>::removeAtPosition(int position) {
 }
 //worst case O(n)
 template <typename T>
-T List<T>::search(const T& key) {
+T List<T>::search(const int key) {
     if (this->size == 0) {
         throw "Error: empty list";
     }
     ListNode<T>* p = this->first->next;
+    //analyzes all list looking for key
     while (p != nullptr) {
         if (p->item == key) {
             return p->item;
@@ -233,6 +236,11 @@ void List<T>::print() {
         p = p->next;
     }
     std::cout << std::endl;
+}
+
+template <typename T>
+int List<T>::getSize(){
+    return this->size;
 }
 
 #endif
