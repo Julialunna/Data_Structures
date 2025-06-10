@@ -15,3 +15,6 @@ struct Pacote {
         return os;
     }
 };
+
+
+Os pacotes que sobrarem na hora do transporte eu ja crio o evento de rearmazenamento e o transporte deles no dia seguinte (tempo atual + 100)

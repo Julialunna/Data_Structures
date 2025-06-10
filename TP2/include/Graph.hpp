@@ -16,7 +16,7 @@ public:
 
     void InsertVertex();
 
-    void InsertEdge(int v, const T &data_for_w, int w, const T &data_for_v);
+    void InsertEdge(int v, int w);
 
     int VertexCount() const;
 
@@ -76,15 +76,15 @@ void Graph<T>::InsertVertex()
 }
 
 template <typename T>
-void Graph<T>::InsertEdge(int v, const T &data_for_w, int w, const T &data_for_v)
+void Graph<T>::InsertEdge(int v, int w)
 {
     // check if index are valid
     if (v < 0 || v >= num_vertex || w < 0 || w >= num_vertex)
     {
         throw "Error: invalid vertex index";
     }
-    this->vertex[v]->insertEnd(data_for_w);
-    //this->vertex[w]->insertEnd(data_for_v);
+    this->vertex[v]->insertEnd(w);
+
 }
 
 // return number of vertex

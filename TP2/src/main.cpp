@@ -1,17 +1,10 @@
-// for(int i =1;i<=num_vertex;i++){
-//     file >> num;
-//     graph_warehouse.InsertVertex();
-//     Warehouse new_warehouse(i, num);
-//     warehouses.insertBeginning(new_warehouse);
-// }
 #include <iostream>
 #include <fstream>
-#include "List.hpp"
-#include "Stack.hpp"
-#include "Queue.hpp"
+#include <string>
 #include "Graph.hpp"
-#include "MinHeap.hpp"
 #include "Warehouse.hpp"
+#include "Scheduler.hpp"
+
 int main(int argc, char*argv[]){
     
     std::string file_name, line;
@@ -29,42 +22,65 @@ int main(int argc, char*argv[]){
         std::cerr << "Error opening file.\n";
         return 1;
     }
-    
-    int num_vertex = 0, num_packages = 0, destination = 0, origin =0;
-    file >> num_vertex;
-    file >> num_packages;
-    file >> origin;
-    file >> destination;
-    Graph<int> graph_warehouse(num_vertex);
-    List<Warehouse> warehouses;
-    List<Package> packages;
-    
-    int neighbor_index = 0, num_neighbors;
-    //reading graph
-    for(int i =0;i<num_vertex;i++){
-        file >> num_neighbors;
-        for(int j=0;j<num_neighbors;j++){
-            file >> neighbor_index;
-            try{
-                graph_warehouse.InsertEdge(i, neighbor_index, i, neighbor_index);
-            }catch (const char* e) {
-                std::cerr << e << "\n";
+
+    int transport_capacity = 0, transport_latency = 0, transport_break = 0, 
+    removal_cost = 0, num_warehouses = 0, is_connected = 0;
+    file >> transport_capacity;
+    file >> transport_latency;
+    file>> transport_break;
+    file >> removal_cost;
+    file >> num_warehouses;
+    Warehouse *warehouses = new Warehouse[num_warehouses];
+    Scheduler scheduler (transport_capacity, transport_latency, transport_break, removal_cost);
+
+    Event evento;
+    evento = scheduler.create_transport_event(2, 32, 3, 4);
+    std::cout<<evento.event_key<<std::endl;
+    //reading warehouses topology
+    Graph<int> graph_warehouses(num_warehouses);
+    for(int i =0; i<num_warehouses; i++){
+        for(int j = 0; j<num_warehouses; j++){
+            file >> is_connected;
+            if(is_connected == 1){
+                graph_warehouses.InsertEdge(i, j);
             }
         }
-        std::cout<<"i: "<<i<<std::endl;
-        graph_warehouse.PrintNeighbors(i);
+        warehouses->set_id(i);
+        warehouses->define_sections(graph_warehouses.FindNeighbors(i)->getSize(), graph_warehouses.FindNeighbors(i));
+    }
+
+    int num_packages = 0;
+    file >> num_packages;
+    Package *packages = new Package[num_packages];
+    std::string name;
+    //getting packages informations
+    for(int i = 0; i<num_packages;i++){
+        int entry = 0, id= 0, origin_warehouse = 0, destination_warehouse = 0;
+        file >> entry;
+        packages[i].set_arrival_time(entry);
+        file >> name;
+        file >> id;
+        packages[i].set_id(id);
+        file >> name;
+        file >> origin_warehouse;
+        packages[i].set_warehouse_origin_id(origin_warehouse);
+        file >> name;
+        file >> destination_warehouse;
+        packages[i].set_warehouse_destination_id(destination_warehouse);
+        packages[i].set_state(1);
+        packages[i].calculate_route(graph_warehouses);
+        
+    }
+    for(int i = 0; i<num_packages;i++){
+    
+        std::cout<<packages[i].get_id()<<" "<<packages[i].get_arrival_time()<<" "<<packages[i].get_warehouse_origin_id()<<" "<<packages[i].get_warehouse_destination_id()<<"\n"; 
+        packages[i].get_route()->print();
         
     }
 
-    Package package(1, origin, destination);
-    packages.insertBeginning(package);
-    Package using_package = packages.search(1);
-    graph_warehouse.BreadthFirstSearch(origin, destination).print();
-    using_package.calculate_route(graph_warehouse);
-    using_package.get_route()->print();
-    Package using_package2 = packages.search(1);
-    using_package2.get_route()->print();
-    std::cout<<"a|"<<std::endl;
+    delete[] packages;
+    delete[] warehouses;
+   
 
     return 0;
 }
