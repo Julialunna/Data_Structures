@@ -17,6 +17,9 @@ Package::Package(int id, int warehouse_origin_id, int warehouse_destination_id){
     this->warehouse_origin_id = warehouse_origin_id;
     this->warehouse_destination_id = warehouse_destination_id;
 }
+Package::~Package() {
+    std::cerr << "📦 Destruindo pacote " << this->id << " (" << this << ")\n";
+}
 void Package::set_arrival_time(int time){
     this->arrival_time = time;
 }
@@ -33,7 +36,7 @@ int Package::get_state(){
     return this->state;
 }
 void Package::set_state(int updated_state){
-    this->state = state;
+    this->state = updated_state;
 }
 //increases storage time
 void Package::increase_storage_time(int increase){

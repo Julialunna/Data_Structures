@@ -75,10 +75,9 @@ int main(int argc, char*argv[]){
         
     }
     scheduler.simulate_deliveries(num_packages, packages, num_warehouses, warehouses);
-    delete[] packages;
+    std::cout<<"B1\n";
     delete[] warehouses;
-   
-
+    delete[] packages;
     return 0;
 }
 

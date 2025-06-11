@@ -24,7 +24,16 @@ public:
     T Remove();
     bool Empty() const;
     T GetData(int j) const;
+    void print() const;
 };
+
+template <typename T>
+void MinHeap<T>::print() const {
+    for (int i = 0; i < this->size; ++i) {
+        std::cout << this->data[i] << " ";
+    }
+    std::cout << std::endl;
+}
 
 template <typename T>
 int MinHeap<T>::GetAncestor(int position) const {
@@ -56,26 +65,30 @@ void MinHeap<T>::Resize(){
 
 template <typename T>
 MinHeap<T>::MinHeap() {
-    capacity = 10;
-    size = 0;
-    data = new T[capacity];
+    this->capacity = 10;
+    this->size = 0;
+    this->data = new T[this->capacity];
 }
 
 template <typename T>
 MinHeap<T>::MinHeap(int maxsize) {
-    data = new T[maxsize];
-    size = 0;
     if(maxsize == 0){
         //garantee minimum capacity permitted
         this->capacity = 1;
     }else{
-        capacity = maxsize;
+        this->capacity = maxsize;
     }
+    this->data = new T[this->capacity];
+    this->size = 0;
 }
 
 template <typename T>
 MinHeap<T>::~MinHeap() {
-    delete[] data;
+    if (data == nullptr) {
+    std::cout << "⚠️ data é nullptr\n";
+    } else {
+        delete[] data;
+    }
 }
 
 template <typename T>

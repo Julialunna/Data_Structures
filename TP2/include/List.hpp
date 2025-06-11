@@ -97,6 +97,10 @@ List<T>::List()
 template <typename T>
 void List<T>::clean()
 {
+    if (this->first == nullptr) {
+    std::cerr << " ERRO: this->first é nullptr no clean()\n";
+    return;
+    }
     ListNode<T> *p = this->first->next;
     while (p != nullptr)
     {

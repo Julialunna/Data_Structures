@@ -29,6 +29,10 @@ struct Event{
         }
     }
 };
+inline std::ostream& operator<<(std::ostream& os, const Event& e) {
+os << e.event_key;
+return os;
+}
 
 class Scheduler{
     private:
@@ -43,7 +47,11 @@ class Scheduler{
     Event create_package_event(int package_id, int time);
     void initialize(int num_packages, Package* packages, int num_warehouses, Warehouse* warehouses);
     void remove_next_event();
-    void end();
+    void execute_event();
+    void execute_transport_event(int num_packages, Package* packages, int num_warehouses, Warehouse* warehouses, Event event);
+    void execute_package_event( Package* packages, Warehouse* warehouses, Event event, int current_time);
+    bool check_empty_sections(int num_warehouses, Warehouse* warehouses);
     void simulate_deliveries(int num_packages, Package* packages, int num_warehouses, Warehouse* warehouses);
+    void end();
 
 };

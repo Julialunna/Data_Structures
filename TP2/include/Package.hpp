@@ -23,6 +23,7 @@ class Package{
     List<int> route;
     public:
     Package();
+    ~Package();
     Package(int id, int warehouse_origin_id, int warehouse_destination_id);
     void set_id(int new_id);
     int get_id();

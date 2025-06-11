@@ -19,10 +19,11 @@ class Warehouse{
     void set_id(int id);
     int get_id();
     void Store_package(Package &package, int section);
-    Package& Retrieve_package(int section);
+    Package Retrieve_package(int section);
     int get_num_sections();
     int find_section_index(int section);
     void define_sections(int num_sections, List<int>* sections);
     int* get_index_section_mapping();
+    Stack<Package>* get_section();
 };
 #endif

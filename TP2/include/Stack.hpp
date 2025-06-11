@@ -25,7 +25,7 @@ public:
 
     void pile(T item);
 
-    T& unstack();
+    T unstack();
 
     void clean();
 
@@ -33,11 +33,17 @@ public:
 
     T search(const T& key);
     int get_size();
+    StackNode<T>* get_top();
+    bool empty();
 
 private:
     StackNode<T>* top;
     int size;
 };
+template <typename T>
+StackNode<T>* Stack<T>::get_top(){
+    return this->top;
+}
 
 template <typename T>
 int Stack<T>::get_size(){
@@ -62,6 +68,10 @@ template <typename T>
 Stack<T>::~Stack() {
     this->clean();
 }
+template <typename T>
+bool Stack<T>::empty(){
+    return this->top == nullptr;
+}
 
 //O(1), put item on top of pile 
 template <typename T>
@@ -74,7 +84,7 @@ void Stack<T>::pile(T item) {
 }
 //O(1), gets node on top of pile and delete it 
 template <typename T>
-T& Stack<T>::unstack() {
+T Stack<T>::unstack() {
     if (this->size == 0) {
         throw "Error: stack is empty";
     }

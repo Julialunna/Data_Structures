@@ -1,13 +1,12 @@
-
 #include "Warehouse.hpp"
 
 void Warehouse::define_sections(int num_sections, List<int>*sections){
     this->num_of_sections = num_sections;
-    this->sections_packages = new Stack<Package>[this->num_of_sections];
+    this->sections_packages = new Stack<Package>[this->num_of_sections]();
     //mapping correspondency of index on stack to neighors warehouses ids
     this->index_section_mapping =  new int[this->num_of_sections];
-    for(int i =1;i<=num_of_sections;i++){
-        this->index_section_mapping[i-1]= sections->getItem(i);
+    for(int i =0;i<num_of_sections;i++){
+        this->index_section_mapping[i]= sections->getItem(i+1);
     }
 }
 void Warehouse::set_id(int id){
@@ -26,9 +25,26 @@ int* Warehouse::get_index_section_mapping(){
     return this->index_section_mapping;
 }
 
+Stack<Package>* Warehouse::get_section(){
+    return this->sections_packages;
+}
+
 Warehouse::~Warehouse(){
-    delete[] this->sections_packages;
-    delete[] this->index_section_mapping;
+    std::cerr << "📦 Destruindo warehouse " << this->id << " (" << this << ")\n";
+    std::cerr << "🧪 Checando stacks de warehouse " << this->id << "...\n";
+for (int i = 0; i < this->num_of_sections; ++i) {
+    std::cerr << "  ↳ Stack[" << i << "] em " << &this->sections_packages[i]
+              << ", size = " << this->sections_packages[i].get_size()
+              << ", top = " << this->sections_packages[i].get_top() << "\n";
+}
+    if (this->sections_packages != nullptr) {
+        delete[] this->sections_packages;
+        std::cout<<"a\n";
+    }
+    if (this->index_section_mapping != nullptr) {
+        delete[] this->index_section_mapping;
+        std::cout<<"b\n";
+    }
 }
 
 //define the index on sections_packages correspondent to the section id
@@ -36,7 +52,6 @@ int Warehouse::find_section_index(int section){
     int found_section = -1;
     for(int i =0;i<this->num_of_sections;i++){
         if(this->index_section_mapping[i]==section){
-            
             found_section = i;
         }
     }
@@ -53,7 +68,7 @@ void Warehouse::Store_package(Package &package, int section){
 }
 
 //get package from section stack
-Package& Warehouse::Retrieve_package(int section){
+Package Warehouse::Retrieve_package(int section){
     int section_index = this->find_section_index(section);
     if(this->sections_packages[section_index].get_size()){
         throw "Empty section";
