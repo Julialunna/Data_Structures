@@ -89,7 +89,7 @@ T Stack<T>::unstack() {
         throw "Error: stack is empty";
     }
     StackNode<T>* p = this->top;
-    T& aux = p->item;
+    T aux = p->item;
     this->top = p->next;
     delete p;
     //reducing size 

@@ -30,20 +30,12 @@ Stack<Package>* Warehouse::get_section(){
 }
 
 Warehouse::~Warehouse(){
-    std::cerr << "📦 Destruindo warehouse " << this->id << " (" << this << ")\n";
-    std::cerr << "🧪 Checando stacks de warehouse " << this->id << "...\n";
-for (int i = 0; i < this->num_of_sections; ++i) {
-    std::cerr << "  ↳ Stack[" << i << "] em " << &this->sections_packages[i]
-              << ", size = " << this->sections_packages[i].get_size()
-              << ", top = " << this->sections_packages[i].get_top() << "\n";
-}
+    
     if (this->sections_packages != nullptr) {
         delete[] this->sections_packages;
-        std::cout<<"a\n";
     }
     if (this->index_section_mapping != nullptr) {
         delete[] this->index_section_mapping;
-        std::cout<<"b\n";
     }
 }
 
@@ -70,7 +62,7 @@ void Warehouse::Store_package(Package &package, int section){
 //get package from section stack
 Package Warehouse::Retrieve_package(int section){
     int section_index = this->find_section_index(section);
-    if(this->sections_packages[section_index].get_size()){
+    if(this->sections_packages[section_index].get_size() == 0){
         throw "Empty section";
     }
     return this->sections_packages[section_index].unstack();
