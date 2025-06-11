@@ -34,8 +34,6 @@ int main(int argc, char*argv[]){
     Scheduler scheduler (transport_capacity, transport_latency, transport_break, removal_cost);
 
     Event evento;
-    evento = scheduler.create_transport_event(2, 32, 3, 4);
-    std::cout<<evento.event_key<<std::endl;
     //reading warehouses topology
     Graph<int> graph_warehouses(num_warehouses);
     for(int i =0; i<num_warehouses; i++){
@@ -45,8 +43,8 @@ int main(int argc, char*argv[]){
                 graph_warehouses.InsertEdge(i, j);
             }
         }
-        warehouses->set_id(i);
-        warehouses->define_sections(graph_warehouses.FindNeighbors(i)->getSize(), graph_warehouses.FindNeighbors(i));
+        warehouses[i].set_id(i);
+        warehouses[i].define_sections(graph_warehouses.FindNeighbors(i)->getSize(), graph_warehouses.FindNeighbors(i));
     }
 
     int num_packages = 0;
@@ -69,7 +67,6 @@ int main(int argc, char*argv[]){
         packages[i].set_warehouse_destination_id(destination_warehouse);
         packages[i].set_state(1);
         packages[i].calculate_route(graph_warehouses);
-        
     }
     for(int i = 0; i<num_packages;i++){
     
@@ -77,7 +74,7 @@ int main(int argc, char*argv[]){
         packages[i].get_route()->print();
         
     }
-
+    scheduler.simulate_deliveries(num_packages, packages, num_warehouses, warehouses);
     delete[] packages;
     delete[] warehouses;
    

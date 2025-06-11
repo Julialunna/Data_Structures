@@ -40,10 +40,10 @@ class Scheduler{
     public:
     Scheduler(int transport_capacity_received,int transport_latency_received, int transport_break_received, int removal_cost_received);
     Event create_transport_event( int time, int warehouse_origin_id, int warehouse_destination_id);
-    Event create_arrival_event(int package_id, int time);
-    void initialize();
+    Event create_package_event(int package_id, int time);
+    void initialize(int num_packages, Package* packages, int num_warehouses, Warehouse* warehouses);
     void remove_next_event();
     void end();
-    void simulate_deliveries(Package* packages, Warehouse* warehouses);
+    void simulate_deliveries(int num_packages, Package* packages, int num_warehouses, Warehouse* warehouses);
 
 };

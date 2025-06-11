@@ -21,9 +21,10 @@ Event Scheduler::create_transport_event(int time, int warehouse_origin_id, int w
     key << 2; // type 2 because it is a transport event
     std::string new_key = key.str();
     new_event.event_key = new_key;
+    this->events.Insert(new_event);
     return new_event;
 }
-Event Scheduler::create_arrival_event(int package_id, int time){
+Event Scheduler::create_package_event(int package_id, int time){
     Event new_event;
     std::ostringstream key;
     key << std::setfill('0') << std::setw(6) << time;
@@ -33,8 +34,17 @@ Event Scheduler::create_arrival_event(int package_id, int time){
     new_event.event_key = new_key;
     return new_event;
 }
-void Scheduler::initialize(){
-
+void Scheduler::initialize(int num_packages, Package* packages, int num_warehouses, Warehouse* warehouses){
+    for(int i =0;i< num_warehouses;i++){
+        std::cout<<"A \n";
+        for(int j = 0;j<warehouses->get_num_sections(); j++){
+            this->create_transport_event(0, warehouses[i].get_id(), warehouses[i].get_index_section_mapping()[j]);
+        }
+    }
+    for(int i =0;i<num_packages;i++){
+        this->create_package_event(packages[i].get_id(), packages[i].get_arrival_time());
+        packages[i].set_state(2);
+    }
 }
 void Scheduler::remove_next_event(){
 
@@ -42,6 +52,7 @@ void Scheduler::remove_next_event(){
 void Scheduler::end(){
 
 }
-void Scheduler::simulate_deliveries(Package* packages, Warehouse* warehouses){
-
+void Scheduler::simulate_deliveries(int num_packages, Package* packages, int num_warehouses, Warehouse* warehouses){
+    int current_time = 0;
+    this->initialize(num_packages, packages, num_warehouses, warehouses);
 }

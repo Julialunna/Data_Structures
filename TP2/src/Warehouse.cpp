@@ -22,6 +22,10 @@ int Warehouse::get_num_sections(){
     return this->num_of_sections;
 }
 
+int* Warehouse::get_index_section_mapping(){
+    return this->index_section_mapping;
+}
+
 Warehouse::~Warehouse(){
     delete[] this->sections_packages;
     delete[] this->index_section_mapping;

@@ -23,5 +23,6 @@ class Warehouse{
     int get_num_sections();
     int find_section_index(int section);
     void define_sections(int num_sections, List<int>* sections);
+    int* get_index_section_mapping();
 };
 #endif
