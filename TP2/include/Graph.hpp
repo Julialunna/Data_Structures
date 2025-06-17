@@ -81,7 +81,7 @@ void Graph<T>::InsertEdge(int v, int w)
     // check if index are valid
     if (v < 0 || v >= num_vertex || w < 0 || w >= num_vertex)
     {
-        throw "Error: invalid vertex index";
+        std::cerr<<"Error: invalid vertex index"<<std::endl;
     }
     this->vertex[v]->insertEnd(w);
 
@@ -113,7 +113,7 @@ void Graph<T>::PrintNeighbors(int v) const
 {
     if (v < 0 || v >= num_vertex)
     {
-        throw "Error: invalid vertex index";
+        std::cerr<< "Error: invalid vertex index"<<std::endl;
     }
     this->vertex[v]->print();
 }
@@ -124,7 +124,7 @@ List<T> *Graph<T>::FindNeighbors(int v) const
 {
     if (v < 0 || v >= num_vertex)
     {
-        throw "Error: invalid vertex index";
+        std::cerr<< "Error: invalid vertex index"<<std::endl;
     }
     return this->vertex[v];
 }

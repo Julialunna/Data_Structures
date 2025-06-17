@@ -1,4 +1,6 @@
 #include "Package.hpp"
+
+
 Package::Package()
     : id(-1)
     , state(1)
@@ -10,14 +12,13 @@ Package::Package()
 
 Package::Package(int id, int warehouse_origin_id, int warehouse_destination_id){
     this->id = id;
-    //conferir
     this->state = 1;
     this->storage_time = 0;
     this->transport_time = 0;
     this->warehouse_origin_id = warehouse_origin_id;
     this->warehouse_destination_id = warehouse_destination_id;
 }
-
+//getters and setters
 void Package::set_arrival_time(int time){
     this->arrival_time = time;
 }
@@ -36,14 +37,6 @@ int Package::get_state(){
 void Package::set_state(int updated_state){
     this->state = updated_state;
 }
-//increases storage time
-void Package::increase_storage_time(int increase){
-    this->storage_time += increase;
-}
-//increases storage time
-void Package::increase_transport_time(int increase){
-    this->transport_time += increase;
-}
 void Package::set_warehouse_origin_id(int id){
     this->warehouse_origin_id =id;
 }
@@ -57,6 +50,15 @@ void Package::set_warehouse_destination_id(int id){
 int Package::get_warehouse_destination_id(){
     return this->warehouse_destination_id;
 }
+//increases storage time
+void Package::increase_storage_time(int increase){
+    this->storage_time += increase;
+}
+//increases storage time
+void Package::increase_transport_time(int increase){
+    this->transport_time += increase;
+}
+
 //calculates route considering breadth first search
 void Package::calculate_route(Graph<int>& warehouses){
    this->route = warehouses.BreadthFirstSearch(

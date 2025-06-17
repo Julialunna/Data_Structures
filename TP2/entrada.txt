@@ -1,18 +1,22 @@
+3 
+18
+90 
 2
-20
-100
-1
-4
-0 0 1 0
-0 0 1 0
-1 1 0 1
-0 0 1 0
-8
-9 pac 0 org 1 dst 0
-45 pac 1 org 1 dst 2
-93 pac 2 org 0 dst 3
-1 pac 3 org 0 dst 3
-92 pac 4 org 3 dst 2
-18 pac 5 org 2 dst 3
-7 pac 6 org 3 dst 2
-78 pac 7 org 0 dst 3
+6
+0 1 1 0 0 0
+1 0 0 1 0 0
+1 0 0 0 1 0
+0 1 0 0 0 1
+0 0 1 0 0 0
+0 0 0 1 0 0
+10
+10 pac 701 org 0 dst 5 
+12 pac 702 org 1 dst 4
+14 pac 703 org 2 dst 3
+18 pac 704 org 5 dst 0
+20 pac 705 org 4 dst 2
+22 pac 706 org 3 dst 1
+25 pac 707 org 0 dst 4
+30 pac 708 org 1 dst 5
+35 pac 709 org 2 dst 0
+40 pac 710 org 3 dst 4

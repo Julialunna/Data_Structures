@@ -13,11 +13,6 @@ ${BUILD_DIR}:
 ${BIN_DIR}:
 	mkdir -p ${BIN_DIR}
 
-# ${BUILD_DIR}/Stack.o: ${INCLUDE_DIR}/Stack.hpp ${SRC_DIR}/Stack.cpp 
-# 	$(CC) $(CFLAGS) -c ${SRC_DIR}/Stack.cpp -I$(INCLUDE_DIR) -o ${BUILD_DIR}/Stack.o
-
-# ${BUILD_DIR}/List.o: ${INCLUDE_DIR}/List.hpp  ${SRC_DIR}/List.cpp 
-# 	$(CC) $(CFLAGS) -c ${SRC_DIR}/List.cpp -I$(INCLUDE_DIR) -o ${BUILD_DIR}/List.o
 
 ${BUILD_DIR}/Package.o: ${INCLUDE_DIR}/Package.hpp ${SRC_DIR}/Package.cpp 
 	$(CC) $(CFLAGS) -c ${SRC_DIR}/Package.cpp -I$(INCLUDE_DIR) -o ${BUILD_DIR}/Package.o

@@ -85,7 +85,7 @@ MinHeap<T>::MinHeap(int maxsize) {
 template <typename T>
 MinHeap<T>::~MinHeap() {
     if (data == nullptr) {
-    std::cout << "⚠️ data é nullptr\n";
+    std::cerr << "data is nullptr"<<std::endl;
     } else {
         delete[] data;
     }

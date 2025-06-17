@@ -78,7 +78,7 @@ template <typename T>
 T Queue<T>::dequeue() {
     //if queue is empty throw error
     if (this->size == 0) {
-        throw "Error: empty queue";
+        std::cerr<<"Error: empty queue"<<std::endl;
     }
     //makes second item be the firts at queue
     QueueNode<T>* p = this->front->next;  

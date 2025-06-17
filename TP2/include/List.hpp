@@ -133,7 +133,7 @@ ListNode<T> *List<T>::position(int position)
 {
     if (position > this->size || position <= 0)
     {
-        throw "Error: invalid position";
+        std::cerr<< "Error: invalid position"<<std::endl;
     }
     ListNode<T> *p = this->first;
     // advance exactly (position - 1) steps from 'first'
@@ -149,7 +149,9 @@ template <typename T>
 //whatver you make with t returned reflects on lists
 T& List<T>::getItem(int position)
 {
+    
     ListNode<T> *p = this->position(position);
+
     // p points to the node before where the item is
     return p->next->item;
 }
@@ -158,7 +160,9 @@ T& List<T>::getItem(int position)
 template <typename T>
 void List<T>::setItem(T item, int position)
 {
+    
     ListNode<T> *p = this->position(position);
+
     p->next->item = item;
 }
 // O(1), inserts ate first->next
@@ -193,7 +197,9 @@ template <typename T>
 void List<T>::insertAtPosition(T item, int position)
 {
     // gets node before the desired one
+    
     ListNode<T> *p = this->position(position);
+    
     ListNode<T> *new_node = new ListNode<T>();
     new_node->item = item;
     new_node->next = p->next;
@@ -212,7 +218,7 @@ T List<T>::removeBeginning()
 {
     if (this->size == 0)
     {
-        throw "Error: empty list";
+        std::cerr<< "Error: empty list"<<std::endl;
     }
     ListNode<T> *p = this->first->next;
     this->first->next = p->next;
@@ -233,10 +239,13 @@ T List<T>::removeEnd()
 {
     if (this->size == 0)
     {
-        throw "Error: empty list";
+        std::cerr<<"Error: empty list"<<std::endl;
     }
     // position(this->size) returns the node before the last item
+    
     ListNode<T> *p = this->position(this->size);
+
+    
     p->next = nullptr;
     this->size--;
     T aux = this->last->item;
@@ -251,9 +260,12 @@ T List<T>::removeAtPosition(int position)
 {
     if (this->size == 0)
     {
-        throw "Error: empty list";
+        std::cerr<<"Error: empty list"<<std::endl;
     }
+    
+        
     ListNode<T> *p = this->position(position);
+   
     ListNode<T> *q = p->next;
     p->next = q->next;
     this->size--;
@@ -271,7 +283,7 @@ T& List<T>::search(const int key)
 {
     if (this->size == 0)
     {
-        throw "Error: empty list";
+        std::cerr<< "Error: empty list"<<std::endl;
     }
     ListNode<T> *p = this->first->next;
     // analyzes all list looking for key

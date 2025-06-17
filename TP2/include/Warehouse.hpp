@@ -9,7 +9,7 @@ class Warehouse{
     int id;
     int num_of_sections;
     int* index_section_mapping;
-    Stack<Package>*sections_packages;
+    Stack<int>*sections_packages;
     public:
     bool operator==(const int& other_id) const {
         return this->id == other_id;
@@ -18,12 +18,13 @@ class Warehouse{
     ~Warehouse();
     void set_id(int id);
     int get_id();
-    void Store_package(Package &package, int section);
-    Package Retrieve_package(int section);
+    void Store_package(int package, int section);
+    int Retrieve_package(int section);
     int get_num_sections();
     int find_section_index(int section);
     void define_sections(int num_sections, List<int>* sections);
     int* get_index_section_mapping();
-    Stack<Package>* get_section();
+    bool is_section_empty(int section);
+    Stack<int>* get_section();
 };
 #endif

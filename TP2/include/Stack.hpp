@@ -86,7 +86,7 @@ void Stack<T>::pile(T item) {
 template <typename T>
 T Stack<T>::unstack() {
     if (this->size == 0) {
-        throw "Error: stack is empty";
+        std::cerr<< "Error: stack is empty"<<std::endl;
     }
     StackNode<T>* p = this->top;
     T aux = p->item;

@@ -9,7 +9,7 @@ state 2: Staggered arrival at a warehouse
 state 3: Stored in section associated to next destine warehouse
 state 4: removed from section to transport
 state 5: Delivered
- */
+*/
 
 class Package{
     private:
@@ -43,3 +43,4 @@ class Package{
     List<int>* get_route();
 };
 #endif
+
