@@ -16,8 +16,6 @@ class Package{
     int id;
     int arrival_time;
     int state;
-    int storage_time;
-    int transport_time;
     int warehouse_origin_id;
     int warehouse_destination_id;
     List<int> route;
@@ -30,8 +28,7 @@ class Package{
     int get_arrival_time();
     int get_state();
     void set_state(int updated_state);
-    void increase_storage_time(int increase);
-    void increase_transport_time(int increase);
+    
     int get_warehouse_origin_id();
     void set_warehouse_origin_id(int id);
     int get_warehouse_destination_id();

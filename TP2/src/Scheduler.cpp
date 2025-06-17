@@ -90,7 +90,6 @@ void Scheduler::execute_transport_event(Package* packages, Warehouse* warehouses
 
                 //staggering package arrival
                 packages[package_removed].set_state(2);
-                packages[package_removed].increase_transport_time(this->transport_latency);
                 this->create_package_event(package_removed, current_time+this->transport_latency);
 
             }else{

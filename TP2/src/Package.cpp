@@ -4,8 +4,6 @@
 Package::Package()
     : id(-1)
     , state(1)
-    , storage_time(0)
-    , transport_time(0)
     , warehouse_origin_id(-1)
     , warehouse_destination_id(-1)
   {}
@@ -13,8 +11,6 @@ Package::Package()
 Package::Package(int id, int warehouse_origin_id, int warehouse_destination_id){
     this->id = id;
     this->state = 1;
-    this->storage_time = 0;
-    this->transport_time = 0;
     this->warehouse_origin_id = warehouse_origin_id;
     this->warehouse_destination_id = warehouse_destination_id;
 }
@@ -49,14 +45,6 @@ void Package::set_warehouse_destination_id(int id){
 
 int Package::get_warehouse_destination_id(){
     return this->warehouse_destination_id;
-}
-//increases storage time
-void Package::increase_storage_time(int increase){
-    this->storage_time += increase;
-}
-//increases storage time
-void Package::increase_transport_time(int increase){
-    this->transport_time += increase;
 }
 
 //calculates route considering breadth first search

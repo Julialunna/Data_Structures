@@ -27,6 +27,7 @@ public:
     void print() const;
 };
 
+//O(n)
 template <typename T>
 void MinHeap<T>::print() const {
     for (int i = 0; i < this->size; ++i) {
@@ -35,16 +36,19 @@ void MinHeap<T>::print() const {
     std::cout << std::endl;
 }
 
+//O(1)
 template <typename T>
 int MinHeap<T>::GetAncestor(int position) const {
     return (position - 1) / 2;
 }
 
+//O(1)
 template <typename T>
 int MinHeap<T>::GetSuccessorLeft(int position) const {
     return 2 * position + 1;
 }
 
+//O(n)
 template <typename T>
 int MinHeap<T>::GetSuccessorRight(int position) const {
     return 2 * position + 2;
@@ -63,6 +67,7 @@ void MinHeap<T>::Resize(){
     delete[] data_to_delete;
 }
 
+//O(1)
 template <typename T>
 MinHeap<T>::MinHeap() {
     this->capacity = 10;
@@ -70,6 +75,7 @@ MinHeap<T>::MinHeap() {
     this->data = new T[this->capacity];
 }
 
+//O(1)
 template <typename T>
 MinHeap<T>::MinHeap(int maxsize) {
     if(maxsize == 0){
@@ -82,6 +88,7 @@ MinHeap<T>::MinHeap(int maxsize) {
     this->size = 0;
 }
 
+//O(1)
 template <typename T>
 MinHeap<T>::~MinHeap() {
     if (data == nullptr) {
@@ -91,6 +98,7 @@ MinHeap<T>::~MinHeap() {
     }
 }
 
+//O(log(n))
 template <typename T>
 void MinHeap<T>::Insert(const T& x) {
     //if heap is full, create more room for data
@@ -111,6 +119,7 @@ void MinHeap<T>::Insert(const T& x) {
     size++;
 }
 
+//O(log(n))
 template <typename T>
 T MinHeap<T>::Remove() {
     T value = data[0];
@@ -149,13 +158,13 @@ T MinHeap<T>::Remove() {
     return value;
 }
 
-//check if heap is empty
+//check if heap is empty, O(1)
 template <typename T>
 bool MinHeap<T>::Empty() const {
     return size == 0;
 }
 
-//return heap data at position j 
+//return heap data at position j O(1)
 template <typename T>
 T MinHeap<T>::GetData(int j) const {
     return data[j];

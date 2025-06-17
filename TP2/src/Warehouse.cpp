@@ -38,7 +38,7 @@ void Warehouse::define_sections(int num_sections, List<int>*sections){
 
     //mapping correspondency of index on stack to neighors warehouses ids
     this->index_section_mapping =  new int[this->num_of_sections];
-    
+
     for(int i =0;i<num_of_sections;i++){
         this->index_section_mapping[i]= sections->getItem(i+1);
     }
@@ -60,15 +60,22 @@ int Warehouse::find_section_index(int section){
 //checks is certain section is empty
 bool Warehouse::is_section_empty(int section){
     int section_index = this->find_section_index(section);
-    if (section_index == -1) return true;
-    return this->sections_packages[section_index].empty();
+    if (section_index == -1){
+        std::cerr<<"Invalid section"<<std::endl;
+        return false;
+    }else{
+        return this->sections_packages[section_index].empty();
+    }
 }
 
 //store package at section
 void Warehouse::Store_package(int package, int section){
     int section_index = this->find_section_index(section);
-    if (section_index == -1) return;
-    this->sections_packages[section_index].pile(package);
+    if (section_index == -1){
+        std::cerr<<"Invalid section"<<std::endl;
+    }else{
+        this->sections_packages[section_index].pile(package);
+    }
     
 }
 
