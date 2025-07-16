@@ -1,0 +1,9 @@
+teste rearmazenamentos
+caso1: pouca contenção 
+capacidade de transporte 10 e frequência baixa 20
+caso 2: mais contenção
+Rearmazenamentos: 11
+Media de tempo armazenado: 227.664
+8855.22
+outros casos no txt frequencia 5
+

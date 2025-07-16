@@ -1,0 +1,37 @@
+#populando tabela de filmes 
+cursor.execute("""
+INSERT INTO filmes (id, titulo, genero, duracao, classificacao_indicativa)
+VALUES (1, 'Vingadores: Ultimato', 'Ação', 181, 12)
+""")
+cursor.execute("""
+INSERT INTO filmes (id, titulo, genero, duracao, classificacao_indicativa)
+VALUES (2, 'Missão Impossível - O Acerto Final', 'Drama', 169, 14)
+""")
+cursor.execute("""
+INSERT INTO filmes (id, titulo, genero, duracao, classificacao_indicativa)
+VALUES (3, 'O predador', 'Ação', 107, 18)
+""")
+cursor.execute("""
+INSERT INTO filmes (id, titulo, genero, duracao, classificacao_indicativa)
+VALUES (4, 'Todos menos você', 'Comédia', 104, 17)
+""")
+cursor.execute("""
+INSERT INTO filmes (id, titulo, genero, duracao, classificacao_indicativa)
+VALUES (5, 'Harry Potter e o Cálice de Fogo', 'Fantasia', 157, 12)
+""")
+cursor.execute("""
+INSERT INTO filmes (id, titulo, genero, duracao, classificacao_indicativa)
+VALUES (6, 'Meu Passado Me Condena', 'Comédia', 104, 12)
+""")
+cursor.execute("""
+INSERT INTO filmes (id, titulo, genero, duracao, classificacao_indicativa)
+VALUES (7, 'Minha Mãe é uma Peça', 'Comédia', 85, 12)
+""")
+cursor.execute("""
+INSERT INTO filmes (id, titulo, genero, duracao, classificacao_indicativa)
+VALUES (8, 'Bala Perdida', 'Ação', 93, 18)
+""")
+cursor.execute("""
+INSERT INTO filmes (id, titulo, genero, duracao, classificacao_indicativa)
+VALUES (9, 'Um Filme Minecraft', Animação, 120, 12)
+""")

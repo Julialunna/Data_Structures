@@ -2,10 +2,10 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Debug PA2",
+            "name": "Debug TP1",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/PA2/bin/pa2.out",
+            "program": "${workspaceFolder}/TP1/bin/tp1.out",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
